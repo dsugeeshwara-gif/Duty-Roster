@@ -3,141 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Duty Roster - Points Based</title>
+    <title>Duty Roster - Staff Database System</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
-        .container { max-width: 850px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
-        #date-display { text-align: center; margin-bottom: 20px; font-weight: bold; color: #64748b; }
+        :root { --primary: #1e40af; --secondary: #64748b; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
+        header { border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+        h1 { color: var(--primary); font-size: 24px; margin: 0; }
+        #date-box { color: var(--secondary); font-weight: bold; margin-top: 5px; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; }
-        td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
-        
-        /* Dropdown Style */
+        th { background: var(--primary); color: white; padding: 12px; text-align: left; text-transform: uppercase; font-size: 14px; }
+        td { border-bottom: 1px solid #e2e8f0; padding: 8px 12px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+
         .officer-select {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 15px;
-            background-color: #fff;
+            border-radius: 5px;
+            font-size: 14px;
             cursor: pointer;
+            outline: none;
         }
+        .officer-select:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(30,64,175,0.2); }
+
+        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; margin-left: 5px; }
+
+        .btn-group { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .print-btn { background: #10b981; color: white; }
+        .clear-btn { background: #ef4444; color: white; }
         
-        .officer-select:focus { border-color: var(--primary); outline: none; background: #f0f7ff; }
-
-        .btn-group { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
-        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; }
-        .print-btn { background: #059669; }
-        .clear-btn { background: #dc2626; }
-
         @media print {
             .btn-group, .instruction { display: none; }
-            body { padding: 0; }
-            .container { box-shadow: none; width: 100%; max-width: 100%; }
+            .container { box-shadow: none; border: none; width: 100%; }
+            body { background: white; padding: 0; }
+            .officer-select { border: none; appearance: none; -webkit-appearance: none; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🛡️ Smart Duty Management</h2>
-    <div id="date-display"></div>
+    <header>
+        <h1>🛡️ Security Duty Roster System</h1>
+        <div id="date-box"></div>
+    </header>
 
-    <p class="instruction" style="font-size: 13px; color: #ef4444;">* එක් එක් ස්ථානය සඳහා සුදුසු සේවකයන් පමණක් ලැයිස්තුවේ පෙන්වනු ඇත.</p>
+    <div class="instruction" style="color: #6366f1; font-size: 13px; margin-bottom: 10px; font-style: italic;">
+        * එක් එක් ස්ථානයට අදාළ නිලධාරීන් පමණක් ලැයිස්තුවේ පෙන්වනු ඇත.
+    </div>
 
-    <table id="dutyTable">
+    <table>
         <thead>
             <tr>
-                <th style="width: 8%;">#</th>
-                <th style="width: 42%;">ස්ථානය (Duty Point)</th>
-                <th>නිලධාරියා තෝරන්න (Select Officer)</th>
+                <th style="width: 10%;">#</th>
+                <th style="width: 40%;">රාජකාරි ස්ථානය</th>
+                <th>නිලධාරියා (Officer)</th>
             </tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="rosterBody"></tbody>
     </table>
 
     <div class="btn-group">
-        <button class="btn print-btn" onclick="window.print()">Print Report</button>
-        <button class="btn clear-btn" onclick="clearRoster()">Clear All</button>
+        <button class="btn print-btn" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn clear-btn" onclick="resetRoster()">Clear Today's Data</button>
     </div>
 </div>
 
 <script>
-    // 1. සේවක ලැයිස්තුව සහ ඔවුන්ට කළ හැකි ස්ථාන (Points) මෙහි ඇතුළත් කරන්න
-    const staffData = [
-        { name: "P. Perera", allowedPoints: ["Guard Room", "Main Gate", "Rounds"] },
-        { name: "S. Kumara", allowedPoints: ["M/E", "Time Office", "Pharmacy"] },
-        { name: "A. Silva", allowedPoints: ["CCTV New", "CCTV Old", "Lobby"] },
-        { name: "W. Jayasinghe", allowedPoints: ["SICU", "Micu", "Doc Lift"] },
-        { name: "N. Fernando", allowedPoints: ["Kitchen", "K/ Stores", "B/C/P"] },
-        { name: "M. Gamage", allowedPoints: ["Guard Room", "Fort City", "L. Hostal New"] },
-        // තව සේවකයන් මෙතනට එකතු කරන්න...
+    // නිලධාරී ලැයිස්තුව වර්ගීකරණය සමඟ
+    const staff = {
+        OIC: ["අසංක", "කුමාර", "සුරංජිත්", "සමරනායක", "දයාරත්න", "සුරේෂ්", "මෙන්ඩිස්", "විජිතලාල්", "රංගන"],
+        SSO: ["තාරක", "ජයලත්", "විරේශ්", "රවී", "අජිත්", "මනූෂ", "රත්නදාස"],
+        LOIC: ["රීටා", "මල්කාන්ති"],
+        JSO: ["ප්‍රසන්න", "ප්‍රදීප් (නාමල්)", "චන්දන", "විජේරත්න", "රාජ්", "දිනේෂ්", "රවිඳු", "ලොකුබංඩා", "සුනිල්", "සම්පත්"],
+        LSO: ["සීලවතී", "නාලනී", "විමලසූරිය", "නන්දනී", "නන්දලතා", "ඩිලානි", "ශ්‍රියාලතා", "ශාන්ති", "නුගවෙල", "චම්පිකා", "පෙරේරා"]
+    };
+
+    // ස්ථානය අනුව අවසර ඇති කාණ්ඩ (Groups)
+    const dutyPoints = [
+        { name: "Guard Room", groups: ["OIC", "SSO"] },
+        { name: "Guard Room", groups: ["OIC", "SSO"] },
+        { name: "M/E", groups: ["SSO", "JSO"] },
+        { name: "M/E", groups: ["SSO", "JSO"] },
+        { name: "Time Office", groups: ["SSO", "JSO"] },
+        { name: "B/C/P", groups: ["JSO", "LSO"] },
+        { name: "B/C/P", groups: ["JSO", "LSO"] },
+        { name: "Glass Door", groups: ["JSO", "LSO"] },
+        { name: "Lobby", groups: ["JSO", "LSO"] },
+        { name: "Lobby", groups: ["JSO", "LSO"] },
+        { name: "C/P/R", groups: ["JSO"] },
+        { name: "Doc Lift", groups: ["JSO", "LSO"] },
+        { name: "Pharmacy", groups: ["JSO", "LSO"] },
+        { name: "Pharmacy OPD", groups: ["JSO", "LSO"] },
+        { name: "Pahamacy H.", groups: ["JSO", "LSO"] },
+        { name: "CCTV New", groups: ["OIC", "SSO", "JSO"] },
+        { name: "CCTV New", groups: ["OIC", "SSO", "JSO"] },
+        { name: "C/P/03", groups: ["JSO"] },
+        { name: "C/P/04", groups: ["JSO"] },
+        { name: "Com. Hostal", groups: ["LSO"] },
+        { name: "Rounds", groups: ["OIC", "SSO"] },
+        { name: "Rounds", groups: ["OIC", "SSO"] },
+        { name: "K/ Stores", groups: ["JSO"] },
+        { name: "Kitchen", groups: ["JSO", "LSO"] },
+        { name: "Main Gate", groups: ["OIC", "SSO", "JSO"] },
+        { name: "2nd B", groups: ["JSO"] },
+        { name: "SICU", groups: ["JSO", "LSO"] },
+        { name: "Micu", groups: ["JSO", "LSO"] },
+        { name: "CCTV Old", groups: ["SSO", "JSO"] },
+        { name: "CCTV Old", groups: ["SSO", "JSO"] },
+        { name: "L/L 03", groups: ["JSO"] },
+        { name: "L/L 04", groups: ["JSO"] },
+        { name: "L/L 05", groups: ["JSO"] },
+        { name: "L/L 06", groups: ["JSO"] },
+        { name: "Fort City", groups: ["JSO"] },
+        { name: "L. Hostal New", groups: ["LSO"] },
+        { name: "Hostal Old", groups: ["LSO"] },
+        { name: "Hostal New", groups: ["LSO"] },
+        { name: "Layanal", groups: ["JSO"] },
+        { name: "Bambala..", groups: ["JSO"] },
+        { name: "Dilan", groups: ["JSO"] }
     ];
 
-    const points = [
-        "Guard Room", "Guard Room", "M/E", "M/E", "Time Office", "B/C/P", "B/C/P", 
-        "Glass Door", "Lobby", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "Pharmacy OPD", 
-        "Pahamacy H.", "CCTV New", "CCTV New", "C/P/03", "C/P/04", "Com. Hostal", 
-        "Rounds", "Rounds", "K/ Stores", "Kitchen", "Main Gate", "2nd B", "SICU", 
-        "Micu", "CCTV Old", "CCTV Old", "L/L 03", "L/L 04", "L/L 05", "L/L 06", 
-        "Fort City", "L. Hostal New", "Hostal Old", "Hostal New", "Layanal", "Bambala..", "Dilan"
-    ];
+    function init() {
+        const body = document.getElementById('rosterBody');
+        const today = new Date().toLocaleDateString('si-LK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('date-box').innerText = today;
 
-    function renderTable() {
-        const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = "";
+        dutyPoints.forEach((point, idx) => {
+            const savedVal = localStorage.getItem(`duty_point_${idx}`) || "";
+            let optionsHTML = `<option value="">-- නිලධාරියා තෝරන්න --</option>`;
 
-        points.forEach((point, index) => {
-            // එම ස්ථානයට අදාළ සේවකයන් පමණක් පෙරා ගැනීම (Filter)
-            const eligibleStaff = staffData.filter(s => s.allowedPoints.includes(point));
-            
-            // කලින් සේව් කළ නම ඇත්නම් එය ලබා ගැනීම
-            const savedValue = localStorage.getItem(`smart_duty_${index}`) || "";
-
-            let selectHTML = `<select class="officer-select" onchange="saveSelection(${index}, this.value)">
-                                <option value="">නම තෝරන්න...</option>`;
-            
-            eligibleStaff.forEach(staff => {
-                let selected = (savedValue === staff.name) ? "selected" : "";
-                selectHTML += `<option value="${staff.name}" ${selected}>${staff.name}</option>`;
+            point.groups.forEach(group => {
+                staff[group].forEach(name => {
+                    const fullName = `${group} ${name}`;
+                    const selected = savedVal === fullName ? "selected" : "";
+                    optionsHTML += `<option value="${fullName}" ${selected}>${fullName}</option>`;
+                });
             });
 
-            // කිසිම විශේෂිත සේවකයෙක් නැතිනම් සියලු සේවකයන් හෝ "No Staff Assigned" පෙන්විය හැක
-            if(eligibleStaff.length === 0) {
-                selectHTML += `<option value="" disabled>සුදුසු සේවකයින් නැත</option>`;
-            }
-
-            selectHTML += `</select>`;
-
-            let row = `<tr>
-                <td>${index + 1}</td>
-                <td><strong>${point}</strong></td>
-                <td>${selectHTML}</td>
+            const row = `<tr>
+                <td>${idx + 1}</td>
+                <td><strong>${point.name}</strong></td>
+                <td><select class="officer-select" onchange="save(${idx}, this.value)">${optionsHTML}</select></td>
             </tr>`;
-            tableBody.innerHTML += row;
+            body.innerHTML += row;
         });
     }
 
-    function saveSelection(index, value) {
-        localStorage.setItem(`smart_duty_${index}`, value);
-    }
+    function save(id, val) { localStorage.setItem(`duty_point_${id}`, val); }
 
-    function clearRoster() {
-        if(confirm("සියලුම දත්ත මැකීමට අවශ්‍යද?")) {
+    function resetRoster() {
+        if(confirm("සියලුම දත්ත මකා අලුත් ලැයිස්තුවක් සකසන්නද?")) {
             localStorage.clear();
-            renderTable();
+            location.reload();
         }
     }
 
-    // දිනය සැකසීම
-    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-    document.getElementById('date-display').innerText = new Date().toLocaleDateString('si-LK', options);
-
-    renderTable();
+    init();
 </script>
-
 </body>
 </html>
