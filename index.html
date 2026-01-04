@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Duty Roster Management</title>
+    <title>Professional Duty Management System</title>
     <style>
-        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --dark: #1e293b; }
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --dark: #1e293b; --bg: #f8fafc; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; background: #e2e8f0; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; background: #eee; padding: 5px; border-radius: 8px; }
+        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; transition: 0.3s; }
         .tab.active { background: var(--primary); color: white; }
 
         .hidden { display: none; }
         
-        /* Admin Section Styles */
-        .staff-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-        
-        .staff-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
-        .point-switches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; padding: 10px; background: white; border-radius: 6px; }
-        
-        /* Switch UI */
-        .switch-btn { padding: 5px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: white; }
-        .switch-btn.active { background: var(--success); color: white; border-color: var(--success); }
+        /* Admin UI */
+        .admin-controls { background: #eff6ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed var(--primary); }
+        .staff-card { background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .point-switches { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 5px; margin-top: 10px; }
+        .sw-btn { padding: 5px; font-size: 10px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: white; white-space: nowrap; overflow: hidden; }
+        .sw-btn.active { background: var(--success); color: white; border-color: var(--success); }
 
-        /* Main Table Styles */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
-        th { background: var(--dark); color: white; }
-        
-        .shift-selector { margin-bottom: 20px; display: flex; align-items: center; gap: 15px; font-weight: bold; }
-        
-        @media print { .tabs, .admin-only, .btn-group { display: none; } }
+        /* Table UI */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: var(--dark); color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
+        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+
+        .shift-btn-group { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+        .shift-btn { padding: 8px 20px; border: 2px solid var(--primary); border-radius: 20px; cursor: pointer; font-weight: bold; background: white; color: var(--primary); }
+        .shift-btn.active { background: var(--primary); color: white; }
+
+        .action-btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+
+        @media print { .tabs, .admin-controls, .shift-btn-group, .action-btn { display: none; } .container { box-shadow: none; border: none; width: 100%; } }
     </style>
 </head>
 <body>
@@ -41,143 +42,110 @@
 <div class="container">
     <div class="tabs">
         <div class="tab active" onclick="showTab('roster-tab')">රාජකාරි වගුව (Roster)</div>
-        <div class="tab" onclick="showTab('admin-tab')">පරිපාලක පුවරුව (Admin Panel)</div>
+        <div class="tab" onclick="showTab('admin-tab')">පාලක පුවරුව (Admin)</div>
     </div>
 
     <div id="roster-tab">
-        <div class="shift-selector">
-            Shift: 
-            <label><input type="radio" name="shift" value="Day" checked onchange="updateShiftDisplay()"> දිවා (Day)</label>
-            <label><input type="radio" name="shift" value="Night" onchange="updateShiftDisplay()"> රාත්‍රී (Night)</label>
-            <span id="display-date" style="margin-left: auto; color: var(--primary);"></span>
+        <div class="shift-btn-group">
+            <div class="shift-btn active" id="btnDay" onclick="setShift('Day')">දිවා (Day)</div>
+            <div class="shift-btn" id="btnNight" onclick="setShift('Night')">රාත්‍රී (Night)</div>
         </div>
+        
         <table id="rosterTable">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th style="width: 50px;">#</th>
                     <th>ස්ථානය (Point)</th>
-                    <th>නිලධාරියා තෝරන්න</th>
+                    <th>නිලධාරියා</th>
                 </tr>
             </thead>
             <tbody id="rosterBody"></tbody>
         </table>
-        <div style="margin-top:20px;">
-            <button onclick="window.print()" style="background:var(--success); color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">Print Roster</button>
-        </div>
+        <button class="action-btn" style="background: #059669;" onclick="window.print()">Print Today's Roster</button>
     </div>
 
     <div id="admin-tab" class="hidden">
-        <h3>සේවක ලැයිස්තුව කළමනාකරණය</h3>
-        <div class="staff-input-group">
-            <input type="text" id="newStaffName" placeholder="නිලධාරියාගේ නම (උදා: OIC අසංක)">
-            <button onclick="addStaff()" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Add Staff</button>
+        <div class="admin-controls">
+            <h4 style="margin: 0 0 10px 0;">ඉක්මන් ඇතුළත් කිරීම</h4>
+            <p style="font-size: 12px; color: #666;">පහත බොත්තම එබූ විට කලින් තිබූ නාමලේඛනය ස්වයංක්‍රීයව පද්ධතියට එකතු වේ.</p>
+            <button class="action-btn" onclick="loadDefaultStaff()">Load Default Staff List</button>
         </div>
-        
+
         <div id="staffList"></div>
     </div>
 </div>
 
 <script>
-    const allPoints = ["Guard Room", "M/E", "Time Office", "B/C/P", "Glass Door", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "CCTV New", "Rounds", "Kitchen", "Main Gate", "SICU", "Micu", "CCTV Old", "Fort City", "Hostal New"];
+    const allPoints = ["Guard Room", "M/E", "Time Office", "B/C/P", "Glass Door", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "Pharmacy OPD", "CCTV New", "Rounds", "K/ Stores", "Kitchen", "Main Gate", "2nd B", "SICU", "Micu", "CCTV Old", "Fort City", "Hostal New", "Layanal", "Dilan"];
+
+    const defaultStaff = [
+        "OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන",
+        "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස",
+        "LOIC රීටා", "LOIC මල්කාන්ති",
+        "JSO ප්‍රසන්න", "JSO ප්‍රදීප් (නාමල්)", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්",
+        "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"
+    ];
 
     let staffData = JSON.parse(localStorage.getItem('duty_staff_db')) || [];
+    let currentShift = 'Day';
 
     function showTab(tabId) {
         document.getElementById('roster-tab').classList.add('hidden');
         document.getElementById('admin-tab').classList.add('hidden');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        
         document.getElementById(tabId).classList.remove('hidden');
         event.currentTarget.classList.add('active');
-        
-        if(tabId === 'roster-tab') renderRoster();
-        if(tabId === 'admin-tab') renderAdmin();
+        if(tabId === 'roster-tab') renderRoster(); else renderAdmin();
     }
 
-    // --- ADMIN LOGIC ---
-    function addStaff() {
-        const name = document.getElementById('newStaffName').value;
-        if(!name) return;
-        staffData.push({ name: name, allowedPoints: [] });
-        saveAndRefresh();
-        document.getElementById('newStaffName').value = "";
+    function setShift(s) {
+        currentShift = s;
+        document.getElementById('btnDay').classList.toggle('active', s === 'Day');
+        document.getElementById('btnNight').classList.toggle('active', s === 'Night');
+        renderRoster();
     }
 
-    function togglePoint(staffIndex, point) {
-        let allowed = staffData[staffIndex].allowedPoints;
-        if(allowed.includes(point)) {
-            staffData[staffIndex].allowedPoints = allowed.filter(p => p !== point);
-        } else {
-            staffData[staffIndex].allowedPoints.push(point);
+    function loadDefaultStaff() {
+        if(confirm("දැනට ඇති සේවක ලැයිස්තුව මකා දමා ප්‍රධාන නාමලේඛනය ඇතුළත් කරන්නද?")) {
+            staffData = defaultStaff.map(name => ({ name: name, allowedPoints: [] }));
+            save();
+            renderAdmin();
         }
-        saveAndRefresh();
     }
 
-    function removeStaff(index) {
-        if(confirm("මෙම සේවකයා ඉවත් කිරීමට අවශ්‍යද?")) {
-            staffData.splice(index, 1);
-            saveAndRefresh();
-        }
+    function togglePoint(sIdx, point) {
+        let allowed = staffData[sIdx].allowedPoints;
+        if(allowed.includes(point)) staffData[sIdx].allowedPoints = allowed.filter(p => p !== point);
+        else staffData[sIdx].allowedPoints.push(point);
+        save();
+        renderAdmin();
     }
 
     function renderAdmin() {
         const list = document.getElementById('staffList');
         list.innerHTML = "";
         staffData.forEach((s, i) => {
-            let pointsHtml = allPoints.map(p => `
-                <button class="switch-btn ${s.allowedPoints.includes(p) ? 'active' : ''}" 
-                        onclick="togglePoint(${i}, '${p}')">${p}</button>
+            let pButtons = allPoints.map(p => `
+                <button class="sw-btn ${s.allowedPoints.includes(p) ? 'active' : ''}" onclick="togglePoint(${i}, '${p}')">${p}</button>
             `).join('');
-            
-            list.innerHTML += `
-                <div class="staff-card">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                        ${s.name}
-                        <button onclick="removeStaff(${i})" style="color:red; border:none; background:none; cursor:pointer;">Delete</button>
-                    </div>
-                    <div style="margin-top:10px; font-size:12px; color:var(--primary);">Select Points:</div>
-                    <div class="point-switches">${pointsHtml}</div>
-                </div>`;
+            list.innerHTML += `<div class="staff-card"><b>${s.name}</b><div class="point-switches">${pButtons}</div></div>`;
         });
     }
 
-    // --- ROSTER LOGIC ---
     function renderRoster() {
         const body = document.getElementById('rosterBody');
         body.innerHTML = "";
-        const shift = document.querySelector('input[name="shift"]:checked').value;
-        
-        allPoints.forEach((point, idx) => {
-            const eligibleStaff = staffData.filter(s => s.allowedPoints.includes(point));
-            let options = eligibleStaff.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-            
-            body.innerHTML += `
-                <tr>
-                    <td>${idx + 1}</td>
-                    <td><strong>${point}</strong></td>
-                    <td>
-                        <select onchange="saveSelection('${shift}_${idx}', this.value)" style="width:100%; padding:5px;">
-                            <option value="">-- තෝරන්න --</option>
-                            ${options}
-                        </select>
-                    </td>
-                </tr>`;
+        allPoints.forEach((p, idx) => {
+            const eligible = staffData.filter(s => s.allowedPoints.includes(p));
+            let saved = localStorage.getItem(`sel_${currentShift}_${idx}`) || "";
+            let opts = eligible.map(s => `<option value="${s.name}" ${saved === s.name ? 'selected' : ''}>${s.name}</option>`).join('');
+            body.innerHTML += `<tr><td>${idx+1}</td><td><b>${p}</b></td><td><select onchange="localStorage.setItem('sel_${currentShift}_${idx}', this.value)"><option value="">-- තෝරන්න --</option>${opts}</select></td></tr>`;
         });
     }
 
-    function saveAndRefresh() {
-        localStorage.setItem('duty_staff_db', JSON.stringify(staffData));
-        renderAdmin();
-    }
+    function save() { localStorage.setItem('duty_staff_db', JSON.stringify(staffData)); }
 
-    function updateShiftDisplay() {
-        renderRoster();
-    }
-
-    // පද්ධතිය ආරම්භයේදී
-    document.getElementById('display-date').innerText = new Date().toLocaleDateString();
     renderRoster();
 </script>
-
 </body>
 </html>
