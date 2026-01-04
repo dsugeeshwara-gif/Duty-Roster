@@ -3,149 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Duty Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>Smart Duty Roster - Points Based</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --success: #22c55e;
-            --bg: #f8fafc;
-            --text: #1e293b;
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container { 
-            max-width: 900px; 
-            margin: auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-        }
-
-        .header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 { margin: 0; font-size: 24px; color: var(--primary); }
-
-        .info-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .search-box {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 10px;
-        }
-
-        th { 
-            background-color: var(--primary); 
-            color: white; 
-            padding: 15px; 
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td { 
-            border-bottom: 1px solid #edf2f7; 
-            padding: 10px 15px; 
-        }
-
-        tr:hover { background-color: #f1f5f9; }
-
-        .officer-input { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 4px; 
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        .officer-input:focus { border-color: var(--primary); background: #f0f7ff; }
-
-        .btn-group {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .print-btn { background: var(--primary); color: white; }
-        .clear-btn { background: #ef4444; color: white; }
+        :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        #date-display { text-align: center; margin-bottom: 20px; font-weight: bold; color: #64748b; }
         
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: var(--primary); color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
+        
+        /* Dropdown Style */
+        .officer-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        
+        .officer-select:focus { border-color: var(--primary); outline: none; background: #f0f7ff; }
+
+        .btn-group { margin-top: 25px; display: flex; gap: 10px; justify-content: center; }
+        .btn { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; }
+        .print-btn { background: #059669; }
+        .clear-btn { background: #dc2626; }
+
         @media print {
-            .print-btn, .clear-btn, .search-box, .btn-group { display: none; }
-            body { padding: 0; background: white; }
+            .btn-group, .instruction { display: none; }
+            body { padding: 0; }
             .container { box-shadow: none; width: 100%; max-width: 100%; }
-            .officer-input { border: none; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>🛡️ Duty Roster Management</h1>
-        <div id="date-display" style="font-weight: 600; color: var(--secondary);"></div>
-    </div>
+    <h2>🛡️ Smart Duty Management</h2>
+    <div id="date-display"></div>
 
-    <div class="info-bar">
-        <input type="text" id="searchInput" class="search-box" placeholder="ස්ථානය සොයන්න (Search point)...">
-    </div>
+    <p class="instruction" style="font-size: 13px; color: #ef4444;">* එක් එක් ස්ථානය සඳහා සුදුසු සේවකයන් පමණක් ලැයිස්තුවේ පෙන්වනු ඇත.</p>
 
     <table id="dutyTable">
         <thead>
             <tr>
-                <th style="width: 10%;">#</th>
-                <th style="width: 45%;">ස්ථානය (Duty Point)</th>
-                <th>නිලධාරියා (Assign Officer)</th>
+                <th style="width: 8%;">#</th>
+                <th style="width: 42%;">ස්ථානය (Duty Point)</th>
+                <th>නිලධාරියා තෝරන්න (Select Officer)</th>
             </tr>
         </thead>
-        <tbody id="tableBody">
-            </tbody>
+        <tbody id="tableBody"></tbody>
     </table>
 
     <div class="btn-group">
-        <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
-        <button class="clear-btn" onclick="clearAll()">Clear All Names</button>
+        <button class="btn print-btn" onclick="window.print()">Print Report</button>
+        <button class="btn clear-btn" onclick="clearRoster()">Clear All</button>
     </div>
 </div>
 
 <script>
+    // 1. සේවක ලැයිස්තුව සහ ඔවුන්ට කළ හැකි ස්ථාන (Points) මෙහි ඇතුළත් කරන්න
+    const staffData = [
+        { name: "P. Perera", allowedPoints: ["Guard Room", "Main Gate", "Rounds"] },
+        { name: "S. Kumara", allowedPoints: ["M/E", "Time Office", "Pharmacy"] },
+        { name: "A. Silva", allowedPoints: ["CCTV New", "CCTV Old", "Lobby"] },
+        { name: "W. Jayasinghe", allowedPoints: ["SICU", "Micu", "Doc Lift"] },
+        { name: "N. Fernando", allowedPoints: ["Kitchen", "K/ Stores", "B/C/P"] },
+        { name: "M. Gamage", allowedPoints: ["Guard Room", "Fort City", "L. Hostal New"] },
+        // තව සේවකයන් මෙතනට එකතු කරන්න...
+    ];
+
     const points = [
         "Guard Room", "Guard Room", "M/E", "M/E", "Time Office", "B/C/P", "B/C/P", 
         "Glass Door", "Lobby", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "Pharmacy OPD", 
@@ -155,51 +86,55 @@
         "Fort City", "L. Hostal New", "Hostal Old", "Hostal New", "Layanal", "Bambala..", "Dilan"
     ];
 
-    // දිනය පෙන්වීම
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('date-display').innerText = new Date().toLocaleDateString('si-LK', options);
-
-    const tableBody = document.getElementById('tableBody');
-
-    // වගුව සෑදීම සහ කලින් සේව් කළ දත්ත ලබා ගැනීම
     function renderTable() {
+        const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
+
         points.forEach((point, index) => {
-            const savedName = localStorage.getItem(`duty_${index}`) || "";
+            // එම ස්ථානයට අදාළ සේවකයන් පමණක් පෙරා ගැනීම (Filter)
+            const eligibleStaff = staffData.filter(s => s.allowedPoints.includes(point));
+            
+            // කලින් සේව් කළ නම ඇත්නම් එය ලබා ගැනීම
+            const savedValue = localStorage.getItem(`smart_duty_${index}`) || "";
+
+            let selectHTML = `<select class="officer-select" onchange="saveSelection(${index}, this.value)">
+                                <option value="">නම තෝරන්න...</option>`;
+            
+            eligibleStaff.forEach(staff => {
+                let selected = (savedValue === staff.name) ? "selected" : "";
+                selectHTML += `<option value="${staff.name}" ${selected}>${staff.name}</option>`;
+            });
+
+            // කිසිම විශේෂිත සේවකයෙක් නැතිනම් සියලු සේවකයන් හෝ "No Staff Assigned" පෙන්විය හැක
+            if(eligibleStaff.length === 0) {
+                selectHTML += `<option value="" disabled>සුදුසු සේවකයින් නැත</option>`;
+            }
+
+            selectHTML += `</select>`;
+
             let row = `<tr>
                 <td>${index + 1}</td>
                 <td><strong>${point}</strong></td>
-                <td><input type="text" class="officer-input" value="${savedName}" oninput="saveData(${index}, this.value)" placeholder="නම ඇතුළත් කරන්න..."></td>
+                <td>${selectHTML}</td>
             </tr>`;
             tableBody.innerHTML += row;
         });
     }
 
-    // දත්ත Local Storage එකට සේව් කිරීම
-    function saveData(index, value) {
-        localStorage.setItem(`duty_${index}`, value);
+    function saveSelection(index, value) {
+        localStorage.setItem(`smart_duty_${index}`, value);
     }
 
-    // සේව් කළ දත්ත මැකීම
-    function clearAll() {
-        if(confirm("ඔබට සියලුම නම් මැකීමට අවශ්‍ය බව ස්ථිරද?")) {
+    function clearRoster() {
+        if(confirm("සියලුම දත්ත මැකීමට අවශ්‍යද?")) {
             localStorage.clear();
             renderTable();
         }
     }
 
-    // Search කිරීමේ හැකියාව
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        let filter = this.value.toUpperCase();
-        let tr = tableBody.getElementsByTagName('tr');
-        for (let i = 0; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName('td')[1];
-            if (td) {
-                let textValue = td.textContent || td.innerText;
-                tr[i].style.display = textValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
-        }
-    });
+    // දිනය සැකසීම
+    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+    document.getElementById('date-display').innerText = new Date().toLocaleDateString('si-LK', options);
 
     renderTable();
 </script>
