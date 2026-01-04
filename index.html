@@ -3,167 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Roster - Staff Database System</title>
+    <title>Advanced Duty Roster Management</title>
     <style>
-        :root { --primary: #1e40af; --secondary: #64748b; --bg: #f1f5f9; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        :root { --primary: #2563eb; --success: #10b981; --danger: #ef4444; --dark: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        header { border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
-        h1 { color: var(--primary); font-size: 24px; margin: 0; }
-        #date-box { color: var(--secondary); font-weight: bold; margin-top: 5px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: bold; background: #e2e8f0; }
+        .tab.active { background: var(--primary); color: white; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; text-transform: uppercase; font-size: 14px; }
-        td { border-bottom: 1px solid #e2e8f0; padding: 8px 12px; }
-        tr:nth-child(even) { background-color: #f8fafc; }
-
-        .officer-select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            outline: none;
-        }
-        .officer-select:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(30,64,175,0.2); }
-
-        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; margin-left: 5px; }
-
-        .btn-group { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
-        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .print-btn { background: #10b981; color: white; }
-        .clear-btn { background: #ef4444; color: white; }
+        .hidden { display: none; }
         
-        @media print {
-            .btn-group, .instruction { display: none; }
-            .container { box-shadow: none; border: none; width: 100%; }
-            body { background: white; padding: 0; }
-            .officer-select { border: none; appearance: none; -webkit-appearance: none; }
-        }
+        /* Admin Section Styles */
+        .staff-input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        
+        .staff-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .point-switches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; padding: 10px; background: white; border-radius: 6px; }
+        
+        /* Switch UI */
+        .switch-btn { padding: 5px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: white; }
+        .switch-btn.active { background: var(--success); color: white; border-color: var(--success); }
+
+        /* Main Table Styles */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background: var(--dark); color: white; }
+        
+        .shift-selector { margin-bottom: 20px; display: flex; align-items: center; gap: 15px; font-weight: bold; }
+        
+        @media print { .tabs, .admin-only, .btn-group { display: none; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>🛡️ Security Duty Roster System</h1>
-        <div id="date-box"></div>
-    </header>
-
-    <div class="instruction" style="color: #6366f1; font-size: 13px; margin-bottom: 10px; font-style: italic;">
-        * එක් එක් ස්ථානයට අදාළ නිලධාරීන් පමණක් ලැයිස්තුවේ පෙන්වනු ඇත.
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('roster-tab')">රාජකාරි වගුව (Roster)</div>
+        <div class="tab" onclick="showTab('admin-tab')">පරිපාලක පුවරුව (Admin Panel)</div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 10%;">#</th>
-                <th style="width: 40%;">රාජකාරි ස්ථානය</th>
-                <th>නිලධාරියා (Officer)</th>
-            </tr>
-        </thead>
-        <tbody id="rosterBody"></tbody>
-    </table>
+    <div id="roster-tab">
+        <div class="shift-selector">
+            Shift: 
+            <label><input type="radio" name="shift" value="Day" checked onchange="updateShiftDisplay()"> දිවා (Day)</label>
+            <label><input type="radio" name="shift" value="Night" onchange="updateShiftDisplay()"> රාත්‍රී (Night)</label>
+            <span id="display-date" style="margin-left: auto; color: var(--primary);"></span>
+        </div>
+        <table id="rosterTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ස්ථානය (Point)</th>
+                    <th>නිලධාරියා තෝරන්න</th>
+                </tr>
+            </thead>
+            <tbody id="rosterBody"></tbody>
+        </table>
+        <div style="margin-top:20px;">
+            <button onclick="window.print()" style="background:var(--success); color:white; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;">Print Roster</button>
+        </div>
+    </div>
 
-    <div class="btn-group">
-        <button class="btn print-btn" onclick="window.print()">Print / Save PDF</button>
-        <button class="btn clear-btn" onclick="resetRoster()">Clear Today's Data</button>
+    <div id="admin-tab" class="hidden">
+        <h3>සේවක ලැයිස්තුව කළමනාකරණය</h3>
+        <div class="staff-input-group">
+            <input type="text" id="newStaffName" placeholder="නිලධාරියාගේ නම (උදා: OIC අසංක)">
+            <button onclick="addStaff()" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Add Staff</button>
+        </div>
+        
+        <div id="staffList"></div>
     </div>
 </div>
 
 <script>
-    // නිලධාරී ලැයිස්තුව වර්ගීකරණය සමඟ
-    const staff = {
-        OIC: ["අසංක", "කුමාර", "සුරංජිත්", "සමරනායක", "දයාරත්න", "සුරේෂ්", "මෙන්ඩිස්", "විජිතලාල්", "රංගන"],
-        SSO: ["තාරක", "ජයලත්", "විරේශ්", "රවී", "අජිත්", "මනූෂ", "රත්නදාස"],
-        LOIC: ["රීටා", "මල්කාන්ති"],
-        JSO: ["ප්‍රසන්න", "ප්‍රදීප් (නාමල්)", "චන්දන", "විජේරත්න", "රාජ්", "දිනේෂ්", "රවිඳු", "ලොකුබංඩා", "සුනිල්", "සම්පත්"],
-        LSO: ["සීලවතී", "නාලනී", "විමලසූරිය", "නන්දනී", "නන්දලතා", "ඩිලානි", "ශ්‍රියාලතා", "ශාන්ති", "නුගවෙල", "චම්පිකා", "පෙරේරා"]
-    };
+    const allPoints = ["Guard Room", "M/E", "Time Office", "B/C/P", "Glass Door", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "CCTV New", "Rounds", "Kitchen", "Main Gate", "SICU", "Micu", "CCTV Old", "Fort City", "Hostal New"];
 
-    // ස්ථානය අනුව අවසර ඇති කාණ්ඩ (Groups)
-    const dutyPoints = [
-        { name: "Guard Room", groups: ["OIC", "SSO"] },
-        { name: "Guard Room", groups: ["OIC", "SSO"] },
-        { name: "M/E", groups: ["SSO", "JSO"] },
-        { name: "M/E", groups: ["SSO", "JSO"] },
-        { name: "Time Office", groups: ["SSO", "JSO"] },
-        { name: "B/C/P", groups: ["JSO", "LSO"] },
-        { name: "B/C/P", groups: ["JSO", "LSO"] },
-        { name: "Glass Door", groups: ["JSO", "LSO"] },
-        { name: "Lobby", groups: ["JSO", "LSO"] },
-        { name: "Lobby", groups: ["JSO", "LSO"] },
-        { name: "C/P/R", groups: ["JSO"] },
-        { name: "Doc Lift", groups: ["JSO", "LSO"] },
-        { name: "Pharmacy", groups: ["JSO", "LSO"] },
-        { name: "Pharmacy OPD", groups: ["JSO", "LSO"] },
-        { name: "Pahamacy H.", groups: ["JSO", "LSO"] },
-        { name: "CCTV New", groups: ["OIC", "SSO", "JSO"] },
-        { name: "CCTV New", groups: ["OIC", "SSO", "JSO"] },
-        { name: "C/P/03", groups: ["JSO"] },
-        { name: "C/P/04", groups: ["JSO"] },
-        { name: "Com. Hostal", groups: ["LSO"] },
-        { name: "Rounds", groups: ["OIC", "SSO"] },
-        { name: "Rounds", groups: ["OIC", "SSO"] },
-        { name: "K/ Stores", groups: ["JSO"] },
-        { name: "Kitchen", groups: ["JSO", "LSO"] },
-        { name: "Main Gate", groups: ["OIC", "SSO", "JSO"] },
-        { name: "2nd B", groups: ["JSO"] },
-        { name: "SICU", groups: ["JSO", "LSO"] },
-        { name: "Micu", groups: ["JSO", "LSO"] },
-        { name: "CCTV Old", groups: ["SSO", "JSO"] },
-        { name: "CCTV Old", groups: ["SSO", "JSO"] },
-        { name: "L/L 03", groups: ["JSO"] },
-        { name: "L/L 04", groups: ["JSO"] },
-        { name: "L/L 05", groups: ["JSO"] },
-        { name: "L/L 06", groups: ["JSO"] },
-        { name: "Fort City", groups: ["JSO"] },
-        { name: "L. Hostal New", groups: ["LSO"] },
-        { name: "Hostal Old", groups: ["LSO"] },
-        { name: "Hostal New", groups: ["LSO"] },
-        { name: "Layanal", groups: ["JSO"] },
-        { name: "Bambala..", groups: ["JSO"] },
-        { name: "Dilan", groups: ["JSO"] }
-    ];
+    let staffData = JSON.parse(localStorage.getItem('duty_staff_db')) || [];
 
-    function init() {
-        const body = document.getElementById('rosterBody');
-        const today = new Date().toLocaleDateString('si-LK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('date-box').innerText = today;
-
-        dutyPoints.forEach((point, idx) => {
-            const savedVal = localStorage.getItem(`duty_point_${idx}`) || "";
-            let optionsHTML = `<option value="">-- නිලධාරියා තෝරන්න --</option>`;
-
-            point.groups.forEach(group => {
-                staff[group].forEach(name => {
-                    const fullName = `${group} ${name}`;
-                    const selected = savedVal === fullName ? "selected" : "";
-                    optionsHTML += `<option value="${fullName}" ${selected}>${fullName}</option>`;
-                });
-            });
-
-            const row = `<tr>
-                <td>${idx + 1}</td>
-                <td><strong>${point.name}</strong></td>
-                <td><select class="officer-select" onchange="save(${idx}, this.value)">${optionsHTML}</select></td>
-            </tr>`;
-            body.innerHTML += row;
-        });
+    function showTab(tabId) {
+        document.getElementById('roster-tab').classList.add('hidden');
+        document.getElementById('admin-tab').classList.add('hidden');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+        
+        if(tabId === 'roster-tab') renderRoster();
+        if(tabId === 'admin-tab') renderAdmin();
     }
 
-    function save(id, val) { localStorage.setItem(`duty_point_${id}`, val); }
+    // --- ADMIN LOGIC ---
+    function addStaff() {
+        const name = document.getElementById('newStaffName').value;
+        if(!name) return;
+        staffData.push({ name: name, allowedPoints: [] });
+        saveAndRefresh();
+        document.getElementById('newStaffName').value = "";
+    }
 
-    function resetRoster() {
-        if(confirm("සියලුම දත්ත මකා අලුත් ලැයිස්තුවක් සකසන්නද?")) {
-            localStorage.clear();
-            location.reload();
+    function togglePoint(staffIndex, point) {
+        let allowed = staffData[staffIndex].allowedPoints;
+        if(allowed.includes(point)) {
+            staffData[staffIndex].allowedPoints = allowed.filter(p => p !== point);
+        } else {
+            staffData[staffIndex].allowedPoints.push(point);
+        }
+        saveAndRefresh();
+    }
+
+    function removeStaff(index) {
+        if(confirm("මෙම සේවකයා ඉවත් කිරීමට අවශ්‍යද?")) {
+            staffData.splice(index, 1);
+            saveAndRefresh();
         }
     }
 
-    init();
+    function renderAdmin() {
+        const list = document.getElementById('staffList');
+        list.innerHTML = "";
+        staffData.forEach((s, i) => {
+            let pointsHtml = allPoints.map(p => `
+                <button class="switch-btn ${s.allowedPoints.includes(p) ? 'active' : ''}" 
+                        onclick="togglePoint(${i}, '${p}')">${p}</button>
+            `).join('');
+            
+            list.innerHTML += `
+                <div class="staff-card">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                        ${s.name}
+                        <button onclick="removeStaff(${i})" style="color:red; border:none; background:none; cursor:pointer;">Delete</button>
+                    </div>
+                    <div style="margin-top:10px; font-size:12px; color:var(--primary);">Select Points:</div>
+                    <div class="point-switches">${pointsHtml}</div>
+                </div>`;
+        });
+    }
+
+    // --- ROSTER LOGIC ---
+    function renderRoster() {
+        const body = document.getElementById('rosterBody');
+        body.innerHTML = "";
+        const shift = document.querySelector('input[name="shift"]:checked').value;
+        
+        allPoints.forEach((point, idx) => {
+            const eligibleStaff = staffData.filter(s => s.allowedPoints.includes(point));
+            let options = eligibleStaff.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            
+            body.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><strong>${point}</strong></td>
+                    <td>
+                        <select onchange="saveSelection('${shift}_${idx}', this.value)" style="width:100%; padding:5px;">
+                            <option value="">-- තෝරන්න --</option>
+                            ${options}
+                        </select>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    function saveAndRefresh() {
+        localStorage.setItem('duty_staff_db', JSON.stringify(staffData));
+        renderAdmin();
+    }
+
+    function updateShiftDisplay() {
+        renderRoster();
+    }
+
+    // පද්ධතිය ආරම්භයේදී
+    document.getElementById('display-date').innerText = new Date().toLocaleDateString();
+    renderRoster();
 </script>
+
 </body>
 </html>
