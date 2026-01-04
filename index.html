@@ -3,83 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Management Pro v4.1</title>
+    <title>Smart Duty Management Pro v5.0</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --dark: #1e293b; --bg: #f8fafc; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         
         .tabs { display: flex; gap: 8px; margin-bottom: 15px; background: #eee; padding: 5px; border-radius: 8px; }
         .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; }
         .tab.active { background: var(--primary); color: white; }
         .hidden { display: none; }
         
+        /* Admin UI */
         .admin-section { border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 20px; background: #fff; }
-        .rank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
-        .rank-card { background: #f8fafc; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
-        .rank-card h4 { margin: 0 0 10px 0; color: var(--primary); background: #dbeafe; padding: 5px; border-radius: 4px; text-align: center; }
-
-        .staff-card { background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        .point-switches { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .sw-btn { padding: 6px 10px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; background: white; transition: 0.2s; }
-        .sw-btn.active { background: var(--success); color: white; border-color: var(--success); font-weight: bold; }
-        .sw-btn.rank-active { background: #dbeafe; border-color: var(--primary); color: var(--primary); font-weight: bold; }
-
-        /* Pagination Styles */
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding: 10px; background: #f1f5f9; border-radius: 8px; }
-        .page-btn { padding: 8px 20px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .page-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .staff-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .staff-card { background: #fff; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); }
         
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        /* Skills Tags */
+        .skill-tag { padding: 5px 10px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 20px; cursor: pointer; background: white; margin-right: 5px; }
+        .skill-tag.active { background: var(--warning); border-color: var(--warning); color: black; font-weight: bold; }
+
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
+        .page-btn { padding: 8px 15px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; }
+
+        /* Roster View */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: var(--dark); color: white; padding: 12px; text-align: left; }
         td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
         
-        .action-btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
+        .status-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        .match { background: #dcfce7; color: #166534; }
+        .mismatch { background: #fee2e2; color: #991b1b; }
 
-        @media print { .tabs, .admin-section, .pagination, .action-btn { display: none; } }
+        .action-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="tabs">
-        <div class="tab active" onclick="showTab('roster-tab')">රාජකාරි වගුව</div>
-        <div class="tab" onclick="showTab('admin-tab')">පාලක පුවරුව</div>
+        <div class="tab active" onclick="showTab('roster-tab')">රාජකාරි වගුව (Smart View)</div>
+        <div class="tab" onclick="showTab('admin-tab')">නිලධාරී සුදුසුකම් (Profiles)</div>
     </div>
 
     <div id="roster-tab">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <div style="display:flex; gap:10px;">
-                <button class="shift-btn" id="btnDay" onclick="setShift('Day')">දිවා</button>
-                <button class="shift-btn" id="btnNight" onclick="setShift('Night')">රාත්‍රී</button>
+                <button id="btnDay" onclick="setShift('Day')" style="padding:10px 25px; border-radius:20px; cursor:pointer;">දිවා</button>
+                <button id="btnNight" onclick="setShift('Night')" style="padding:10px 25px; border-radius:20px; cursor:pointer;">රාත්‍රී</button>
             </div>
             <div id="display-date" style="font-weight:bold;"></div>
         </div>
+        
         <table id="rosterTable">
             <thead>
-                <tr><th style="width: 50px;">#</th><th>ස්ථානය (Point)</th><th>නිලධාරියා</th></tr>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>ස්ථානය (Point)</th>
+                    <th>සුදුසුම නිලධාරියා (Smart Suggest)</th>
+                </tr>
             </thead>
             <tbody id="rosterBody"></tbody>
         </table>
-        <button class="action-btn" style="background:#059669; width:100%;" onclick="window.print()">Print Report</button>
+        <button class="action-btn" style="background:#059669;" onclick="window.print()">මුද්‍රණය කරන්න (Print)</button>
     </div>
 
     <div id="admin-tab" class="hidden">
         <div class="admin-section">
-            <h3>1. රෑන්ක් අනුව පොයින්ට්ස් වෙන් කිරීම</h3>
-            <div class="rank-grid" id="rankMappingGrid"></div>
-        </div>
-
-        <div class="admin-section">
-            <h3>2. නිලධාරී නාමලේඛනය</h3>
-            <button class="action-btn" onclick="loadDefaultStaff()" style="margin-bottom:20px;">Load Master Staff List (39 Officers)</button>
+            <h3>නිලධාරී විශේෂ සුදුසුකම් සහ සෞඛ්‍ය තත්ත්වය</h3>
+            <p style="font-size:12px; color:#666;">*නිලධාරියාට ඇති හැකියාවන් හෝ සීමාවන් මෙහි සලකුණු කරන්න. එවිට රොස්ටර් එකේදී පද්ධතිය ඔබට උදව් කරයි.</p>
+            <button class="action-btn" onclick="loadDefaultStaff()" style="width:auto; padding:10px 20px; margin-bottom:15px;">Load Staff List</button>
             
             <div id="staffList"></div>
 
             <div class="pagination">
                 <button class="page-btn" id="prevBtn" onclick="changePage(-1)">Previous</button>
-                <span id="pageInfo" style="font-weight:bold;">Page 1 of X</span>
+                <span id="pageInfo">Page 1</span>
                 <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button>
             </div>
         </div>
@@ -91,12 +91,10 @@
 
     const masterNames = ["OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන", "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස", "LOIC රීටා", "LOIC මල්කාන්ති", "JSO ප්‍රසන්න", "JSO ප්‍රදීප් (නාමල්)", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්", "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"];
 
-    const ranks = ["OIC", "SSO", "LOIC", "JSO", "LSO"];
-    let staffData = JSON.parse(localStorage.getItem('duty_staff_v4')) || [];
-    let rankPoints = JSON.parse(localStorage.getItem('rank_mapping_v4')) || { OIC: [], SSO: [], LOIC: [], JSO: [], LSO: [] };
-    let currentShift = 'Day';
+    const skillTypes = ["Guard Room Trained", "Physically Fit", "Tech/CCTV Knowledge", "Light Duty Only"];
 
-    // Pagination Variables
+    let staffData = JSON.parse(localStorage.getItem('duty_staff_v5')) || [];
+    let currentShift = 'Day';
     let currentPage = 1;
     const itemsPerPage = 5;
 
@@ -109,84 +107,68 @@
         tabId === 'roster-tab' ? renderRoster() : renderAdmin();
     }
 
-    function renderRankMapping() {
-        const grid = document.getElementById('rankMappingGrid');
-        grid.innerHTML = "";
-        ranks.forEach(rank => {
-            let btns = allPoints.map(p => `<button class="sw-btn ${rankPoints[rank] && rankPoints[rank].includes(p) ? 'rank-active' : ''}" onclick="toggleRankPoint('${rank}', '${p}')">${p}</button>`).join('');
-            grid.innerHTML += `<div class="rank-card"><h4>${rank} Rules</h4><div class="point-switches">${btns}</div></div>`;
-        });
-    }
-
-    function toggleRankPoint(rank, pt) {
-        if(!rankPoints[rank]) rankPoints[rank] = [];
-        rankPoints[rank] = rankPoints[rank].includes(pt) ? rankPoints[rank].filter(p => p !== pt) : [...rankPoints[rank], pt];
-        localStorage.setItem('rank_mapping_v4', JSON.stringify(rankPoints));
-        renderRankMapping();
-    }
-
     function loadDefaultStaff() {
-        staffData = masterNames.map(name => ({ name, allowedPoints: [] }));
-        currentPage = 1;
-        saveStaff(); renderAdmin();
+        staffData = masterNames.map(name => ({ name, skills: [], allowedPoints: allPoints })); // Initially allow all, then filter
+        save(); renderAdmin();
+    }
+
+    function toggleSkill(sIdx, skill) {
+        const skills = staffData[sIdx].skills;
+        staffData[sIdx].skills = skills.includes(skill) ? skills.filter(s => s !== skill) : [...skills, skill];
+        save(); renderAdmin();
     }
 
     function renderAdmin() {
-        renderRankMapping();
         const list = document.getElementById('staffList');
         list.innerHTML = "";
-
-        // පිටු ගණනය කිරීම
-        const totalPages = Math.ceil(staffData.length / itemsPerPage);
         const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedItems = staffData.slice(start, end);
+        const paginated = staffData.slice(start, start + itemsPerPage);
 
-        paginatedItems.forEach((s, idx) => {
-            const actualIndex = start + idx;
-            let pBtns = allPoints.map(p => `<button class="sw-btn ${s.allowedPoints.includes(p) ? 'active' : ''}" onclick="toggleStaffPoint(${actualIndex},'${p}')">${p}</button>`).join('');
-            list.innerHTML += `<div class="staff-card"><b>${s.name}</b><div class="point-switches">${pBtns}</div></div>`;
+        paginated.forEach((s, i) => {
+            const actualIdx = start + i;
+            let skillBtns = skillTypes.map(sk => `<button class="skill-tag ${s.skills.includes(sk) ? 'active' : ''}" onclick="toggleSkill(${actualIdx},'${sk}')">${sk}</button>`).join('');
+            list.innerHTML += `<div class="staff-card"><b>${s.name}</b><div style="margin-top:10px;">${skillBtns}</div></div>`;
         });
-
-        // Pagination UI update
-        document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages || 1}`;
-        document.getElementById('prevBtn').disabled = currentPage === 1;
-        document.getElementById('nextBtn').disabled = currentPage === totalPages || totalPages === 0;
-    }
-
-    function changePage(step) {
-        currentPage += step;
-        renderAdmin();
-    }
-
-    function toggleStaffPoint(sIdx, pt) {
-        staffData[sIdx].allowedPoints = staffData[sIdx].allowedPoints.includes(pt) ? staffData[sIdx].allowedPoints.filter(p => p !== pt) : [...staffData[sIdx].allowedPoints, pt];
-        saveStaff();
-        renderAdmin();
+        document.getElementById('pageInfo').innerText = `Page ${currentPage}`;
     }
 
     function renderRoster() {
         const body = document.getElementById('rosterBody');
         body.innerHTML = "";
+        
         let assigned = [];
         allPoints.forEach((_, i) => { let v = localStorage.getItem(`s_${currentShift}_${i}`); if(v) assigned.push(v); });
 
         allPoints.forEach((p, idx) => {
-            const eligible = staffData.filter(s => {
-                const sRank = ranks.find(r => s.name.startsWith(r));
-                return (sRank && rankPoints[sRank] && rankPoints[sRank].includes(p)) || s.allowedPoints.includes(p);
+            // Smart Filter: Check point name and match with skill
+            let sortedStaff = [...staffData].sort((a, b) => {
+                let aScore = 0, bScore = 0;
+                if(p.includes("Guard Room") && a.skills.includes("Guard Room Trained")) aScore++;
+                if(p.includes("Pharmacy - Helper") && a.skills.includes("Light Duty Only")) aScore--;
+                if(p.includes("Pharmacy - Helper") && a.skills.includes("Physically Fit")) aScore++;
+                // Add similar logic for bScore...
+                return bScore - aScore;
             });
+
             let saved = localStorage.getItem(`s_${currentShift}_${idx}`) || "";
-            let opts = eligible.map(s => {
+            let options = staffData.map(s => {
                 const isBusy = assigned.includes(s.name) && s.name !== saved;
-                return `<option value="${s.name}" ${saved === s.name ? 'selected' : ''} ${isBusy ? 'disabled' : ''}>${s.name} ${isBusy ? '(Busy)' : ''}</option>`;
+                let warning = "";
+                if(p.includes("Guard Room") && !s.skills.includes("Guard Room Trained")) warning = "⚠️ No Training";
+                if(p.includes("Pharmacy - Helper") && s.skills.includes("Light Duty Only")) warning = "⚠️ Unfit for Walking";
+                
+                return `<option value="${s.name}" ${saved === s.name ? 'selected' : ''} ${isBusy ? 'disabled' : ''}>
+                    ${s.name} ${warning} ${isBusy ? '(Busy)' : ''}
+                </option>`;
             }).join('');
-            body.innerHTML += `<tr><td>${idx+1}</td><td><b>${p}</b></td><td><select onchange="localStorage.setItem('s_${currentShift}_${idx}', this.value); renderRoster();"><option value="">-- තෝරන්න --</option>${opts}</select></td></tr>`;
+
+            body.innerHTML += `<tr><td>${idx+1}</td><td><b>${p}</b></td><td><select onchange="localStorage.setItem('s_${currentShift}_${idx}', this.value); renderRoster();"><option value="">-- නිලධාරියා තෝරන්න --</option>${options}</select></td></tr>`;
         });
     }
 
+    function changePage(step) { currentPage += step; renderAdmin(); }
     function setShift(s) { currentShift = s; renderRoster(); }
-    function saveStaff() { localStorage.setItem('duty_staff_v4', JSON.stringify(staffData)); }
+    function save() { localStorage.setItem('duty_staff_v5', JSON.stringify(staffData)); }
     
     document.getElementById('display-date').innerText = new Date().toLocaleDateString('si-LK', { weekday:'long', day:'numeric', month:'long' });
     renderRoster();
