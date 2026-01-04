@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Duty Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        }
+
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary); }
+
+        .info-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 10px;
+        }
+
+        th { 
+            background-color: var(--primary); 
+            color: white; 
+            padding: 15px; 
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td { 
+            border-bottom: 1px solid #edf2f7; 
+            padding: 10px 15px; 
+        }
+
+        tr:hover { background-color: #f1f5f9; }
+
+        .officer-input { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 4px; 
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .officer-input:focus { border-color: var(--primary); background: #f0f7ff; }
+
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .print-btn { background: var(--primary); color: white; }
+        .clear-btn { background: #ef4444; color: white; }
+        
+        @media print {
+            .print-btn, .clear-btn, .search-box, .btn-group { display: none; }
+            body { padding: 0; background: white; }
+            .container { box-shadow: none; width: 100%; max-width: 100%; }
+            .officer-input { border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🛡️ Duty Roster Management</h1>
+        <div id="date-display" style="font-weight: 600; color: var(--secondary);"></div>
+    </div>
+
+    <div class="info-bar">
+        <input type="text" id="searchInput" class="search-box" placeholder="ස්ථානය සොයන්න (Search point)...">
+    </div>
+
+    <table id="dutyTable">
+        <thead>
+            <tr>
+                <th style="width: 10%;">#</th>
+                <th style="width: 45%;">ස්ථානය (Duty Point)</th>
+                <th>නිලධාරියා (Assign Officer)</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            </tbody>
+    </table>
+
+    <div class="btn-group">
+        <button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+        <button class="clear-btn" onclick="clearAll()">Clear All Names</button>
+    </div>
+</div>
+
+<script>
+    const points = [
+        "Guard Room", "Guard Room", "M/E", "M/E", "Time Office", "B/C/P", "B/C/P", 
+        "Glass Door", "Lobby", "Lobby", "C/P/R", "Doc Lift", "Pharmacy", "Pharmacy OPD", 
+        "Pahamacy H.", "CCTV New", "CCTV New", "C/P/03", "C/P/04", "Com. Hostal", 
+        "Rounds", "Rounds", "K/ Stores", "Kitchen", "Main Gate", "2nd B", "SICU", 
+        "Micu", "CCTV Old", "CCTV Old", "L/L 03", "L/L 04", "L/L 05", "L/L 06", 
+        "Fort City", "L. Hostal New", "Hostal Old", "Hostal New", "Layanal", "Bambala..", "Dilan"
+    ];
+
+    // දිනය පෙන්වීම
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('date-display').innerText = new Date().toLocaleDateString('si-LK', options);
+
+    const tableBody = document.getElementById('tableBody');
+
+    // වගුව සෑදීම සහ කලින් සේව් කළ දත්ත ලබා ගැනීම
+    function renderTable() {
+        tableBody.innerHTML = "";
+        points.forEach((point, index) => {
+            const savedName = localStorage.getItem(`duty_${index}`) || "";
+            let row = `<tr>
+                <td>${index + 1}</td>
+                <td><strong>${point}</strong></td>
+                <td><input type="text" class="officer-input" value="${savedName}" oninput="saveData(${index}, this.value)" placeholder="නම ඇතුළත් කරන්න..."></td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    // දත්ත Local Storage එකට සේව් කිරීම
+    function saveData(index, value) {
+        localStorage.setItem(`duty_${index}`, value);
+    }
+
+    // සේව් කළ දත්ත මැකීම
+    function clearAll() {
+        if(confirm("ඔබට සියලුම නම් මැකීමට අවශ්‍ය බව ස්ථිරද?")) {
+            localStorage.clear();
+            renderTable();
+        }
+    }
+
+    // Search කිරීමේ හැකියාව
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toUpperCase();
+        let tr = tableBody.getElementsByTagName('tr');
+        for (let i = 0; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName('td')[1];
+            if (td) {
+                let textValue = td.textContent || td.innerText;
+                tr[i].style.display = textValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    });
+
+    renderTable();
+</script>
+
+</body>
+</html>
