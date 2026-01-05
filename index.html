@@ -3,162 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Management Pro v7.0</title>
+    <title>Duty Point Setup v10.0</title>
     <style>
-        :root { --primary: #2563eb; --success: #10b981; --dark: #1e293b; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        :root { --primary: #2563eb; --success: #10b981; --dark: #1e293b; --bg: #f1f5f9; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; background: #eee; padding: 5px; border-radius: 8px; }
-        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #e2e8f0; padding: 5px; border-radius: 10px; }
+        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 8px; font-weight: bold; transition: 0.3s; }
         .tab.active { background: var(--primary); color: white; }
         .hidden { display: none; }
+
+        /* Point Section Styles */
+        .point-block { border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 25px; overflow: hidden; }
+        .point-title { background: var(--dark); color: white; padding: 12px 20px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; }
         
-        /* Shift Toggle */
-        .shift-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .shift-btn { flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; font-weight: bold; background: white; transition: 0.3s; }
-        .shift-btn.active.day { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
-        .shift-btn.active.night { border-color: #4338ca; background: #eef2ff; color: #3730a3; }
-
-        /* Point Config */
-        .config-card { background: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; align-items: center; }
-        .config-header { font-weight: bold; font-size: 12px; color: #64748b; margin-bottom: 5px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--dark); color: white; padding: 12px; text-align: left; }
-        td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
-
-        .slot-box { margin-bottom: 5px; }
-        .action-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; }
-        select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
+        .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 15px; background: #fff; }
         
-        @media print { .tabs, .shift-selector, .admin-section, .action-btn { display: none; } }
+        /* Switch Style */
+        .sw-container { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .sw-container:hover { background: #eff6ff; }
+        .sw-container.active { background: #dcfce7; border-color: var(--success); }
+        
+        .sw-label { font-size: 14px; font-weight: 500; }
+        .sw-box { width: 40px; height: 20px; background: #cbd5e1; border-radius: 20px; position: relative; transition: 0.3s; }
+        .sw-box::after { content: ''; width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
+        .active .sw-box { background: var(--success); }
+        .active .sw-box::after { left: 22px; }
+
+        .sticky-header { position: sticky; top: 0; background: white; padding: 10px 0; z-index: 100; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .action-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('roster-tab')">රාජකාරි වගුව (Roster)</div>
-        <div class="tab" onclick="showTab('admin-tab')">පොයින්ට් සැකසුම් (Setup)</div>
+    <div class="sticky-header">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('setup-tab')">පොයින්ට් එකට සේවකයින් සැකසීම</div>
+            <div class="tab" onclick="showTab('roster-tab')">රාජකාරි බෙදාහැරීම</div>
+        </div>
+        <div id="setup-info" style="font-size: 13px; color: #666; padding: 0 10px;">
+            සෑම පොයින්ට් එකක් යටතේම එම ස්ථානයට සුදුසු සේවකයින්ගේ ස්වීචය On කරන්න.
+        </div>
     </div>
 
-    <div id="roster-tab">
-        <div class="shift-selector">
-            <button class="shift-btn day active" id="btnDay" onclick="setShift('Day')">☀️ දිවා (Day)</button>
-            <button class="shift-btn night" id="btnNight" onclick="setShift('Night')">🌙 රාත්‍රී (Night)</button>
-        </div>
+    <div id="setup-tab">
+        <div id="pointContainer"></div>
+    </div>
 
-        <table id="rosterTable">
+    <div id="roster-tab" class="hidden">
+        <h2 style="text-align:center;">අවසන් රාජකාරි වගුව</h2>
+        <table id="rosterTable" style="width:100%; border-collapse: collapse;">
             <thead>
-                <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>ස්ථානය (Point)</th>
-                    <th>නිලධාරියා/නිලධාරීන් (Officers)</th>
+                <tr style="background:var(--dark); color:white;">
+                    <th style="padding:15px; text-align:left;">ස්ථානය (Duty Point)</th>
+                    <th style="padding:15px; text-align:left;">සුදුසු නිලධාරියා තෝරන්න</th>
                 </tr>
             </thead>
             <tbody id="rosterBody"></tbody>
         </table>
-        <button class="action-btn" style="background:#059669;" onclick="window.print()">මුද්‍රණය කරන්න (Print)</button>
-    </div>
-
-    <div id="admin-tab" class="hidden">
-        <div class="admin-section">
-            <h3>සේවා මුරය අනුව නිලධාරීන් ගණන තීරණය කිරීම</h3>
-            <div class="config-card" style="background: none; border:none; padding-bottom:0;">
-                <div class="config-header">පොයින්ට් එක</div>
-                <div class="config-header">දිවා ගණන</div>
-                <div class="config-header">රාත්‍රී ගණන</div>
-            </div>
-            <div id="pointConfigList"></div>
-            <button class="action-btn" onclick="loadDefaultStaff()">Load Master Staff List</button>
-        </div>
     </div>
 </div>
 
 <script>
-    const pointsArray = ["Guard Room", "M/E Entry", "Time Office", "B/C/P", "Glass Door", "Lobby", "C/P/R", "Doctors' Lift", "Pharmacy - Main", "Pharmacy - OPD", "Pharmacy - Helper", "CCTV New", "C/P/03", "C/P/04", "Commercial Hostel", "Rounds", "Kitchen Stores", "Kitchen", "Main Gate", "2nd Basement", "SICU", "MICU", "CCTV Old", "Lift Lobby - 3rd Floor", "Lift Lobby - 4th Floor", "Lift Lobby - 5th Floor", "Lift Lobby - 6th Floor", "Fort City", "Lady Hostel - New", "Hostal - Old", "Hostal - New", "Layanal Area", "Bambalapitiya Area", "Dilan Area", "Receiving"];
+    const points = ["Guard Room", "Pharmacy", "Lobby", "CCTV", "Doctors' Lift", "Rounds", "Time Office", "Main Gate"];
+    
+    const staffNames = [
+        "OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන",
+        "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස",
+        "LOIC රීටා", "LOIC මල්කාන්ති",
+        "JSO ප්‍රසන්න", "JSO ප්‍රදීප්", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්",
+        "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"
+    ];
 
-    // Default settings: Most points have 1 officer in day/night
-    let pointData = JSON.parse(localStorage.getItem('point_config_v7')) || 
-        pointsArray.reduce((acc, p) => ({ ...acc, [p]: { day: 1, night: 1 } }), {});
-
-    let staffData = JSON.parse(localStorage.getItem('duty_staff_v7')) || [];
-    let currentShift = 'Day';
+    // Data Structure: { "Guard Room": ["OIC අසංක", "OIC කුමාර"], "Pharmacy": ["LSO සීලවතී"] }
+    let pointStaffMap = JSON.parse(localStorage.getItem('pointStaffMap_v10')) || {};
 
     function showTab(tabId) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('setup-tab').classList.add('hidden');
         document.getElementById('roster-tab').classList.add('hidden');
-        document.getElementById('admin-tab').classList.add('hidden');
         document.getElementById(tabId).classList.remove('hidden');
         event.currentTarget.classList.add('active');
-        if(tabId === 'admin-tab') renderAdmin(); else renderRoster();
+        if(tabId === 'roster-tab') renderRoster();
     }
 
-    function renderAdmin() {
-        const list = document.getElementById('pointConfigList');
-        list.innerHTML = pointsArray.map(p => `
-            <div class="config-card">
-                <div style="font-weight:bold; font-size:14px;">${p}</div>
-                <input type="number" min="0" value="${pointData[p].day}" onchange="updateConfig('${p}', 'day', this.value)">
-                <input type="number" min="0" value="${pointData[p].night}" onchange="updateConfig('${p}', 'night', this.value)">
-            </div>
-        `).join('');
+    function renderSetup() {
+        const container = document.getElementById('pointContainer');
+        container.innerHTML = "";
+
+        points.forEach(p => {
+            let staffHTML = staffNames.map(name => {
+                const isActive = (pointStaffMap[p] || []).includes(name);
+                return `
+                    <div class="sw-container ${isActive ? 'active' : ''}" onclick="toggleMapping('${p}', '${name}')">
+                        <span class="sw-label">${name}</span>
+                        <div class="sw-box"></div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML += `
+                <div class="point-block">
+                    <div class="point-title">
+                        <span>${p}</span>
+                        <small style="font-size:12px; font-weight:normal;">සුදුසු සේවකයින් තෝරන්න</small>
+                    </div>
+                    <div class="staff-grid">${staffHTML}</div>
+                </div>
+            `;
+        });
     }
 
-    function updateConfig(point, shift, val) {
-        pointData[point][shift] = parseInt(val) || 0;
-        localStorage.setItem('point_config_v7', JSON.stringify(pointData));
-    }
-
-    function setShift(s) {
-        currentShift = s;
-        document.getElementById('btnDay').classList.toggle('active', s === 'Day');
-        document.getElementById('btnNight').classList.toggle('active', s === 'Night');
-        renderRoster();
+    function toggleMapping(point, name) {
+        if (!pointStaffMap[point]) pointStaffMap[point] = [];
+        
+        if (pointStaffMap[point].includes(name)) {
+            pointStaffMap[point] = pointStaffMap[point].filter(n => n !== name);
+        } else {
+            pointStaffMap[point].push(name);
+        }
+        
+        localStorage.setItem('pointStaffMap_v10', JSON.stringify(pointStaffMap));
+        renderSetup();
     }
 
     function renderRoster() {
         const body = document.getElementById('rosterBody');
         body.innerHTML = "";
-        let rowIdx = 1;
 
-        pointsArray.forEach(p => {
-            const count = (currentShift === 'Day') ? pointData[p].day : pointData[p].night;
+        points.forEach(p => {
+            const allowedStaff = pointStaffMap[p] || [];
+            let options = allowedStaff.map(s => `<option value="${s}">${s}</option>`).join('');
             
-            // නිලධාරීන් ගණන 0 ට වඩා වැඩි නම් පමණක් පෙන්වන්න
-            if (count > 0) {
-                let slotsHTML = "";
-                for (let i = 1; i <= count; i++) {
-                    let saved = localStorage.getItem(`s_${currentShift}_${p}_${i}`) || "";
-                    slotsHTML += `
-                        <div class="slot-box">
-                            <select onchange="localStorage.setItem('s_${currentShift}_${p}_${i}', this.value)">
-                                <option value="">-- නිලධාරියා ${count > 1 ? i : ''} තෝරන්න --</option>
-                                ${staffData.map(s => `<option value="${s.name}" ${saved === s.name ? 'selected' : ''}>${s.name}</option>`).join('')}
-                            </select>
-                        </div>`;
-                }
-
-                body.innerHTML += `
-                    <tr>
-                        <td>${rowIdx++}</td>
-                        <td><b>${p}</b> <br><small style="color:blue;">(Officers: ${count})</small></td>
-                        <td>${slotsHTML}</td>
-                    </tr>`;
-            }
+            body.innerHTML += `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:15px;"><b>${p}</b></td>
+                    <td style="padding:15px;">
+                        <select style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc;">
+                            <option value="">-- සුදුසු නිලධාරීන් ${allowedStaff.length} ක් ඇත --</option>
+                            ${options}
+                        </select>
+                    </td>
+                </tr>
+            `;
         });
     }
 
-    function loadDefaultStaff() {
-        // ඔබ මීට පෙර ලබා දුන් සම්පූර්ණ නාමලේඛනය මෙහි පවතින බව උපකල්පනය කෙරේ
-        const names = ["OIC අසංක", "OIC කුමාර", "SSO තාරක", "LSO සීලවතී", "JSO දිනේෂ්"]; 
-        staffData = names.map(n => ({ name: n }));
-        localStorage.setItem('duty_staff_v7', JSON.stringify(staffData));
-        renderRoster();
-    }
-
-    renderRoster();
+    renderSetup();
 </script>
 </body>
 </html>
