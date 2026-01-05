@@ -3,120 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Point Setup v10.0</title>
+    <title>Duty Point Setup v11.0</title>
     <style>
         :root { --primary: #2563eb; --success: #10b981; --dark: #1e293b; --bg: #f1f5f9; }
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #e2e8f0; padding: 5px; border-radius: 10px; }
-        .tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 8px; font-weight: bold; transition: 0.3s; }
-        .tab.active { background: var(--primary); color: white; }
-        .hidden { display: none; }
+        /* Navigation */
+        .step-info { background: #dbeafe; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--primary); }
+        .nav-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; border-top: 2px solid #eee; padding-top: 20px; }
+        
+        /* Point Header */
+        .point-display { background: var(--dark); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .point-display h2 { margin: 0; font-size: 24px; letter-spacing: 1px; }
 
-        /* Point Section Styles */
-        .point-block { border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 25px; overflow: hidden; }
-        .point-title { background: var(--dark); color: white; padding: 12px 20px; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; }
+        /* Staff Grid */
+        .search-box { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .staff-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px; }
         
-        .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 15px; background: #fff; }
-        
-        /* Switch Style */
-        .sw-container { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .sw-container:hover { background: #eff6ff; }
+        .sw-container { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; }
         .sw-container.active { background: #dcfce7; border-color: var(--success); }
-        
-        .sw-label { font-size: 14px; font-weight: 500; }
-        .sw-box { width: 40px; height: 20px; background: #cbd5e1; border-radius: 20px; position: relative; transition: 0.3s; }
-        .sw-box::after { content: ''; width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
+        .sw-label { font-size: 13px; font-weight: bold; }
+        .sw-box { width: 34px; height: 18px; background: #cbd5e1; border-radius: 20px; position: relative; }
+        .sw-box::after { content: ''; width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.3s; }
         .active .sw-box { background: var(--success); }
-        .active .sw-box::after { left: 22px; }
+        .active .sw-box::after { left: 18px; }
 
-        .sticky-header { position: sticky; top: 0; background: white; padding: 10px 0; z-index: 100; border-bottom: 2px solid #eee; margin-bottom: 20px; }
-        .action-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-prev { background: #64748b; color: white; }
+        .btn-save { background: var(--success); color: white; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="sticky-header">
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('setup-tab')">පොයින්ට් එකට සේවකයින් සැකසීම</div>
-            <div class="tab" onclick="showTab('roster-tab')">රාජකාරි බෙදාහැරීම</div>
-        </div>
-        <div id="setup-info" style="font-size: 13px; color: #666; padding: 0 10px;">
-            සෑම පොයින්ට් එකක් යටතේම එම ස්ථානයට සුදුසු සේවකයින්ගේ ස්වීචය On කරන්න.
-        </div>
+<div class="container" id="main-container">
+    <div class="step-info" id="stepIndicator">Point 1 of 42</div>
+
+    <div class="point-display">
+        <small>දැනට සකසන ස්ථානය (Current Point)</small>
+        <h2 id="currentPointName">Guard Room</h2>
     </div>
 
-    <div id="setup-tab">
-        <div id="pointContainer"></div>
-    </div>
+    <input type="text" class="search-box" id="staffSearch" placeholder="සේවකයෙකු සොයන්න (Search name...)" oninput="renderStaff()">
 
-    <div id="roster-tab" class="hidden">
-        <h2 style="text-align:center;">අවසන් රාජකාරි වගුව</h2>
-        <table id="rosterTable" style="width:100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background:var(--dark); color:white;">
-                    <th style="padding:15px; text-align:left;">ස්ථානය (Duty Point)</th>
-                    <th style="padding:15px; text-align:left;">සුදුසු නිලධාරියා තෝරන්න</th>
-                </tr>
-            </thead>
-            <tbody id="rosterBody"></tbody>
-        </table>
+    <div class="staff-list" id="staffList">
+        </div>
+
+    <div class="nav-controls">
+        <button class="btn btn-prev" id="prevBtn" onclick="changePoint(-1)">Back</button>
+        <button class="btn btn-next" id="nextBtn" onclick="changePoint(1)">Next Point</button>
     </div>
+    
+    <button class="btn btn-save" style="width:100%; margin-top:10px;" onclick="goToRoster()">රාජකාරි වගුව බලන්න (View Roster)</button>
 </div>
 
 <script>
-    const points = ["Guard Room", "Pharmacy", "Lobby", "CCTV", "Doctors' Lift", "Rounds", "Time Office", "Main Gate"];
-    
-    const staffNames = [
-        "OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන",
-        "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස",
-        "LOIC රීටා", "LOIC මල්කාන්ති",
-        "JSO ප්‍රසන්න", "JSO ප්‍රදීප්", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්",
-        "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"
-    ];
+    const points = ["Guard Room - Post 01", "Guard Room - Post 02", "M/E Entry - 01", "M/E Entry - 02", "Time Office", "B/C/P - Post 01", "B/C/P - Post 02", "Glass Door", "Lobby - Post 01", "Lobby - Post 02", "C/P/R", "Doctors' Lift", "Pharmacy - Main", "Pharmacy - OPD", "Pharmacy - Helper", "CCTV New - 01", "CCTV New - 02", "C/P/03", "C/P/04", "Commercial Hostel", "Rounds - 01", "Rounds - 02", "Kitchen Stores", "Kitchen", "Main Gate", "2nd Basement", "SICU", "MICU", "CCTV Old - 01", "CCTV Old - 02", "Lift Lobby - 3rd Floor", "Lift Lobby - 4th Floor", "Lift Lobby - 5th Floor", "Lift Lobby - 6th Floor", "Fort City", "Lady Hostel - New", "Hostal - Old", "Hostal - New", "Layanal Area", "Bambalapitiya Area", "Dilan Area", "Receiving"];
 
-    // Data Structure: { "Guard Room": ["OIC අසංක", "OIC කුමාර"], "Pharmacy": ["LSO සීලවතී"] }
-    let pointStaffMap = JSON.parse(localStorage.getItem('pointStaffMap_v10')) || {};
+    const staffNames = ["OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන", "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස", "LOIC රීටා", "LOIC මල්කාන්ති", "JSO ප්‍රසන්න", "JSO ප්‍රදීප්", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්", "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"];
 
-    function showTab(tabId) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('setup-tab').classList.add('hidden');
-        document.getElementById('roster-tab').classList.add('hidden');
-        document.getElementById(tabId).classList.remove('hidden');
-        event.currentTarget.classList.add('active');
-        if(tabId === 'roster-tab') renderRoster();
-    }
+    let pointStaffMap = JSON.parse(localStorage.getItem('pointStaffMap_v11')) || {};
+    let currentPointIdx = 0;
 
-    function renderSetup() {
-        const container = document.getElementById('pointContainer');
-        container.innerHTML = "";
-
-        points.forEach(p => {
-            let staffHTML = staffNames.map(name => {
-                const isActive = (pointStaffMap[p] || []).includes(name);
-                return `
-                    <div class="sw-container ${isActive ? 'active' : ''}" onclick="toggleMapping('${p}', '${name}')">
+    function renderStaff() {
+        const list = document.getElementById('staffList');
+        const searchTerm = document.getElementById('staffSearch').value.toLowerCase();
+        const currentPoint = points[currentPointIdx];
+        
+        list.innerHTML = "";
+        staffNames.forEach(name => {
+            if (name.toLowerCase().includes(searchTerm)) {
+                const isActive = (pointStaffMap[currentPoint] || []).includes(name);
+                list.innerHTML += `
+                    <div class="sw-container ${isActive ? 'active' : ''}" onclick="toggleStaff('${name}')">
                         <span class="sw-label">${name}</span>
                         <div class="sw-box"></div>
-                    </div>
-                `;
-            }).join('');
-
-            container.innerHTML += `
-                <div class="point-block">
-                    <div class="point-title">
-                        <span>${p}</span>
-                        <small style="font-size:12px; font-weight:normal;">සුදුසු සේවකයින් තෝරන්න</small>
-                    </div>
-                    <div class="staff-grid">${staffHTML}</div>
-                </div>
-            `;
+                    </div>`;
+            }
         });
+        
+        document.getElementById('currentPointName').innerText = currentPoint;
+        document.getElementById('stepIndicator').innerText = `Point ${currentPointIdx + 1} of ${points.length}`;
+        document.getElementById('prevBtn').disabled = currentPointIdx === 0;
+        document.getElementById('nextBtn').innerText = currentPointIdx === points.length - 1 ? "Finish" : "Next Point";
     }
 
-    function toggleMapping(point, name) {
+    function toggleStaff(name) {
+        const point = points[currentPointIdx];
         if (!pointStaffMap[point]) pointStaffMap[point] = [];
         
         if (pointStaffMap[point].includes(name)) {
@@ -125,33 +99,27 @@
             pointStaffMap[point].push(name);
         }
         
-        localStorage.setItem('pointStaffMap_v10', JSON.stringify(pointStaffMap));
-        renderSetup();
+        localStorage.setItem('pointStaffMap_v11', JSON.stringify(pointStaffMap));
+        renderStaff();
     }
 
-    function renderRoster() {
-        const body = document.getElementById('rosterBody');
-        body.innerHTML = "";
-
-        points.forEach(p => {
-            const allowedStaff = pointStaffMap[p] || [];
-            let options = allowedStaff.map(s => `<option value="${s}">${s}</option>`).join('');
-            
-            body.innerHTML += `
-                <tr style="border-bottom:1px solid #eee;">
-                    <td style="padding:15px;"><b>${p}</b></td>
-                    <td style="padding:15px;">
-                        <select style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc;">
-                            <option value="">-- සුදුසු නිලධාරීන් ${allowedStaff.length} ක් ඇත --</option>
-                            ${options}
-                        </select>
-                    </td>
-                </tr>
-            `;
-        });
+    function changePoint(step) {
+        currentPointIdx += step;
+        if (currentPointIdx < 0) currentPointIdx = 0;
+        if (currentPointIdx >= points.length) {
+            alert("සියලුම පොයින්ට්ස් සැකසීම අවසන්!");
+            currentPointIdx = points.length - 1;
+        }
+        document.getElementById('staffSearch').value = ""; // Clear search
+        renderStaff();
     }
 
-    renderSetup();
+    function goToRoster() {
+        alert("රොස්ටර් එක බැලීමට සූදානම්. (මෙහිදී ඔබ On කළ සේවකයින් පමණක් අදාළ පොයින්ට් එකට පෙන්වනු ඇත)");
+        // මෙතැනින් Roster Page එකට Link කළ හැක
+    }
+
+    renderStaff();
 </script>
 </body>
 </html>
