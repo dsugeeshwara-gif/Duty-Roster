@@ -3,98 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Duty Setup v12.0</title>
+    <title>DutyPro Dashboard</title>
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --bg: #f8fafc; --success: #22c55e; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; }
-        .header { background: var(--dark); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        .container { padding: 20px; overflow-x: auto; }
+        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-white: #FFFFFF; --text-main: #050505; --text-sec: #65676B; }
+        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--fb-bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Search Bars */
-        .search-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; flex: 1; font-size: 14px; }
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--fb-white); border-right: 1px solid #ddd; padding: 20px 10px; display: flex; flex-direction: column; gap: 5px; }
+        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover { background: #E4E6E9; }
+        .nav-item.active { color: var(--fb-blue); background: #E7F3FF; }
 
-        /* Grid Table */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        th { background: #e2e8f0; padding: 12px; font-size: 12px; position: sticky; top: 80px; z-index: 10; border: 1px solid #cbd5e1; }
-        td { border: 1px solid #e2e8f0; padding: 8px; text-align: center; }
+        /* Main Content */
+        .main-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: sticky; top: 0; background: var(--fb-bg); padding: 10px 0; z-index: 10; }
+        .search-bar { background: #E4E6E9; border: none; padding: 10px 20px; border-radius: 50px; width: 300px; outline: none; }
+
+        /* Point Cards */
+        .points-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .point-card { background: var(--fb-white); border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); padding: 15px; }
+        .point-header { border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; font-size: 18px; color: var(--fb-blue); }
         
-        /* Cell Styles */
-        .point-name { text-align: left; font-weight: bold; background: #f8fafc; min-width: 180px; position: sticky; left: 0; z-index: 5; border-right: 2px solid #cbd5e1; }
-        .cell-check { width: 40px; height: 40px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .cell-check.active { background: #dcfce7; color: var(--success); font-weight: bold; }
-        .cell-check:hover { background: #eff6ff; }
+        /* Staff Selection List */
+        .staff-scroll { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .staff-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 5px; border-radius: 6px; transition: 0.2s; }
+        .staff-row:hover { background: #F2F2F2; }
+        
+        /* Switch UI */
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--fb-blue); }
+        input:checked + .slider:before { transform: translateX(18px); }
 
-        .btn-view { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: white; padding: 15px 30px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 10px 15px rgba(37, 99, 235, 0.3); }
+        /* Table View */
+        .roster-card { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid #eee; color: var(--text-sec); }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        .badge { background: #E7F3FF; color: var(--fb-blue); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h2 style="margin:0;">Duty Allocation Matrix</h2>
-    <p style="margin:5px 0 0; font-size:12px; opacity:0.8;">පොයින්ට් එක සහ සේවකයා හමුවන කොටුව මත ක්ලික් කර සලකුණු කරන්න</p>
+<div class="sidebar">
+    <h2 style="padding: 0 15px; color: var(--fb-blue);">DutyPro</h2>
+    <div class="nav-item active" onclick="switchView('setup')">⚙️ Setup Point</div>
+    <div class="nav-item" onclick="switchView('roster')">📋 View Roster</div>
+    <div class="nav-item" onclick="switchView('staff')">👥 Staff Directory</div>
 </div>
 
-<div class="container">
-    <div class="search-container">
-        <input type="text" id="pointSearch" placeholder="පොයින්ට් එකක් සොයන්න (Search Point...)" oninput="renderTable()">
-        <input type="text" id="staffSearch" placeholder="සේවකයෙක් සොයන්න (Search Staff...)" oninput="renderTable()">
+<div class="main-content">
+    <div id="view-setup">
+        <div class="header">
+            <h2>පොයින්ට් එකට සේවකයින් තෝරන්න</h2>
+            <input type="text" class="search-bar" placeholder="සොයන්න (Search points...)" oninput="filterPoints(this.value)">
+        </div>
+        <div class="points-grid" id="pointsGrid"></div>
     </div>
 
-    <table id="matrixTable">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+    <div id="view-roster" class="hidden">
+        <div class="header">
+            <h2>අද දින රාජකාරි ලේඛනය</h2>
+            <button onclick="window.print()" style="padding:10px 20px; border-radius:5px; background:var(--fb-blue); color:white; border:none; cursor:pointer;">Print Roster</button>
+        </div>
+        <div class="roster-card">
+            <table>
+                <thead><tr><th>රාජකාරි ස්ථානය</th><th>තෝරාගත් නිලධාරියා</th></tr></thead>
+                <tbody id="rosterTableBody"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<button class="btn-view" onclick="alert('රාජකාරි වගුව සූදානම්!')">View Roster</button>
-
 <script>
-    const points = ["Guard Room - Post 01", "Guard Room - Post 02", "M/E Entry - 01", "M/E Entry - 02", "Time Office", "B/C/P - Post 01", "B/C/P - Post 02", "Glass Door", "Lobby - Post 01", "Lobby - Post 02", "C/P/R", "Doctors' Lift", "Pharmacy - Main", "Pharmacy - OPD", "Pharmacy - Helper", "CCTV New - 01", "CCTV New - 02", "C/P/03", "C/P/04", "Commercial Hostel", "Rounds - 01", "Rounds - 02", "Kitchen Stores", "Kitchen", "Main Gate", "2nd Basement", "SICU", "MICU", "CCTV Old - 01", "CCTV Old - 02", "Lift Lobby - 3rd Floor", "Lift Lobby - 4th Floor", "Lift Lobby - 5th Floor", "Lift Lobby - 6th Floor", "Fort City", "Lady Hostel - New", "Hostal - Old", "Hostal - New", "Layanal Area", "Bambalapitiya Area", "Dilan Area", "Receiving"];
+    const points = ["Guard Room - Post 01", "M/E Entry - 01", "Time Office", "Lobby - Post 01", "Pharmacy - Main", "CCTV New - 01", "Main Gate", "Rounds - 01"];
+    const staff = ["OIC අසංක", "OIC කුමාර", "SSO තාරක", "JSO දිනේෂ්", "LSO සීලවතී", "SSO රවී", "LOIC රීටා", "JSO සම්පත්"];
 
-    const staff = ["OIC අසංක", "OIC කුමාර", "OIC සුරංජිත්", "OIC සමරනායක", "OIC දයාරත්න", "OIC සුරේෂ්", "OIC මෙන්ඩිස්", "OIC විජිතලාල්", "OIC රංගන", "SSO තාරක", "SSO ජයලත්", "SSO විරේශ්", "SSO රවී", "SSO අජිත්", "SSO මනූෂ", "SSO රත්නදාස", "LOIC රීටා", "LOIC මල්කාන්ති", "JSO ප්‍රසන්න", "JSO ප්‍රදීප්", "JSO චන්දන", "JSO විජේරත්න", "JSO රාජ්", "JSO දිනේෂ්", "JSO රවිඳු", "JSO ලොකුබංඩා", "JSO සුනිල්", "JSO සම්පත්", "LSO සීලවතී", "LSO නාලනී", "LSO විමලසූරිය", "LSO නන්දනී", "LSO නන්දලතා", "LSO ඩිලානි", "LSO ශ්‍රියාලතා", "LSO ශාන්ති", "LSO නුගවෙල", "LSO චම්පිකා", "LSO පෙරේරා"];
+    let db = JSON.parse(localStorage.getItem('fb_duty_db')) || {};
 
-    let db = JSON.parse(localStorage.getItem('matrix_db_v12')) || {};
-
-    function renderTable() {
-        const pSearch = document.getElementById('pointSearch').value.toLowerCase();
-        const sSearch = document.getElementById('staffSearch').value.toLowerCase();
+    function switchView(view) {
+        document.getElementById('view-setup').classList.add('hidden');
+        document.getElementById('view-roster').classList.add('hidden');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         
-        const head = document.getElementById('tableHead');
-        const body = document.getElementById('tableBody');
+        if(view === 'setup') {
+            document.getElementById('view-setup').classList.remove('hidden');
+            renderSetup();
+        } else {
+            document.getElementById('view-roster').classList.remove('hidden');
+            renderRoster();
+        }
+        event.currentTarget.classList.add('active');
+    }
 
-        // Filter Staff
-        const filteredStaff = staff.filter(s => s.toLowerCase().includes(sSearch));
-        // Filter Points
-        const filteredPoints = points.filter(p => p.toLowerCase().includes(pSearch));
-
-        // Header
-        head.innerHTML = `<tr><th class="point-name">Point Name</th>${filteredStaff.map(s => `<th>${s}</th>`).join('')}</tr>`;
-
-        // Body
-        body.innerHTML = filteredPoints.map(p => `
-            <tr>
-                <td class="point-name">${p}</td>
-                ${filteredStaff.map(s => {
-                    const isActive = db[p] && db[p].includes(s);
-                    return `<td class="cell-check ${isActive ? 'active' : ''}" onclick="toggleCell('${p}', '${s}')">${isActive ? '✓' : ''}</td>`;
-                }).join('')}
-            </tr>
+    function renderSetup() {
+        const grid = document.getElementById('pointsGrid');
+        grid.innerHTML = points.map(p => `
+            <div class="point-card">
+                <div class="point-header">${p}</div>
+                <div class="staff-scroll">
+                    ${staff.map(s => {
+                        const isChecked = db[p] && db[p].includes(s);
+                        return `
+                            <div class="staff-row">
+                                <span>${s}</span>
+                                <label class="switch">
+                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleStaff('${p}', '${s}')">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>`;
+                    }).join('')}
+                </div>
+            </div>
         `).join('');
     }
 
-    function toggleCell(p, s) {
-        if (!db[p]) db[p] = [];
-        if (db[p].includes(s)) {
-            db[p] = db[p].filter(name => name !== s);
-        } else {
-            db[p].push(s);
-        }
-        localStorage.setItem('matrix_db_v12', JSON.stringify(db));
-        renderTable();
+    function toggleStaff(p, s) {
+        if(!db[p]) db[p] = [];
+        if(db[p].includes(s)) db[p] = db[p].filter(x => x !== s);
+        else db[p].push(s);
+        localStorage.setItem('fb_duty_db', JSON.stringify(db));
     }
 
-    renderTable();
+    function renderRoster() {
+        const body = document.getElementById('rosterTableBody');
+        body.innerHTML = points.map(p => {
+            const allowed = db[p] || [];
+            return `
+                <tr>
+                    <td><b>${p}</b></td>
+                    <td>
+                        <select style="padding:8px; border-radius:5px; border:1px solid #ddd; width:100%;">
+                            <option>තෝරන්න (${allowed.length})</option>
+                            ${allowed.map(a => `<option>${a}</option>`).join('')}
+                        </select>
+                    </td>
+                </tr>`;
+        }).join('');
+    }
+
+    function filterPoints(val) {
+        const cards = document.querySelectorAll('.point-card');
+        cards.forEach(card => {
+            const txt = card.querySelector('.point-header').innerText.toLowerCase();
+            card.style.display = txt.includes(val.toLowerCase()) ? 'block' : 'none';
+        });
+    }
+
+    renderSetup();
 </script>
 </body>
 </html>
