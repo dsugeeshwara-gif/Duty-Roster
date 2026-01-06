@@ -1,210 +1,146 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IronShield Defender – Day / Night</title>
-
+<title>Security Duty Roster System</title>
 <style>
-:root{--p:#1a237e;--s:#d32f2f;--g:#2e7d32}
-body{margin:0;font-family:Segoe UI;background:#f4f7f9;padding-bottom:160px}
-.header{background:var(--p);color:#fff;padding:15px;font-weight:800;text-align:center;position:sticky;top:0}
-.container{max-width:560px;margin:auto;padding:15px}
-.panel{display:none;background:#fff;padding:18px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.panel.active{display:block}
-.row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #eee}
-.scroll{max-height:55vh;overflow:auto;border:1px solid #ddd;border-radius:8px;padding:10px}
-.point{border:1px solid #ddd;border-radius:10px;padding:12px;margin-bottom:12px}
-.title{font-weight:bold;color:var(--s)}
-.last{font-size:11px;color:#777;font-style:italic}
-select,input{width:100%;padding:10px;margin-top:6px;border-radius:6px;border:1px solid #bbb}
-.btn{padding:14px;border:none;border-radius:8px;font-weight:bold;width:100%;margin-top:8px}
-.auto{background:#ff9800;color:#fff}
-.next{background:var(--p);color:#fff}
-.wa{background:var(--g);color:#fff}
-.copy{background:#555;color:#fff}
-.footer{position:fixed;bottom:0;width:100%;background:#fff;padding:10px;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
-.badge{font-size:11px;color:#fff;background:#777;padding:2px 6px;border-radius:6px}
-.shift{background:#eee;font-weight:bold;text-align:center}
+body { font-family: Arial; background:#f4f6f8; padding:20px }
+h2 { margin-top:30px }
+.box { background:#fff; padding:15px; margin-bottom:20px; border-radius:8px }
+.member { display:inline-block; width:220px }
+.point { margin-bottom:10px }
+select { padding:5px; width:200px }
+button { padding:10px 15px; margin-top:10px }
 </style>
 </head>
 
 <body>
 
-<div class="header">IRONSHIELD DEFENDER – DAY / NIGHT</div>
+<h1>Security Duty Assignment</h1>
 
-<div class="container">
-
-<!-- STEP 1 -->
-<div id="step1" class="panel active">
-<h3>1️⃣ Shift & Attendance</h3>
-
-<select id="shift" onchange="loadAttendance()">
-  <option value="DAY">🌞 DAY SHIFT (07.00 – 19.00)</option>
-  <option value="NIGHT">🌙 NIGHT SHIFT (19.00 – 07.00)</option>
-</select>
-
-<input placeholder="නම සොයන්න..." onkeyup="filterNames(this.value)">
-<div id="attendance" class="scroll"></div>
-
-<button class="btn" onclick="saveAttendance()">💾 Save This Shift Attendance</button>
-
-<div class="footer">
-<button class="btn next" onclick="goStep(2)">Next ➜</button>
-</div>
+<!-- MEMBERS -->
+<div class="box">
+<h2>All Staff</h2>
+<div id="members"></div>
 </div>
 
-<!-- STEP 2 -->
-<div id="step2" class="panel">
-<h3>2️⃣ Duty Assignment</h3>
-<div id="shiftLabel" class="shift"></div>
-
-<button class="btn auto" onclick="autoAssign()">✨ Auto Assign</button>
-<div id="points" class="scroll"></div>
-
-<div class="footer">
-<button class="btn wa" onclick="sendWA()">📱 WhatsApp</button>
-<button class="btn copy" onclick="copyText()">📋 Copy</button>
-<button class="btn" onclick="goStep(1)">⬅ Back</button>
-</div>
+<!-- DAY ATTENDANCE -->
+<div class="box">
+<h2>Day Shift Attendance</h2>
+<div id="dayAttendance"></div>
+<button onclick="renderPoints('day')">Load Day Points</button>
 </div>
 
+<!-- NIGHT ATTENDANCE -->
+<div class="box">
+<h2>Night Shift Attendance</h2>
+<div id="nightAttendance"></div>
+<button onclick="renderPoints('night')">Load Night Points</button>
+</div>
+
+<!-- POINTS -->
+<div class="box">
+<h2>Duty Points</h2>
+<div id="points"></div>
+<button onclick="autoAssign()">Auto Assign</button>
 </div>
 
 <script>
-// ================= STAFF =================
+// ================= STAFF DATABASE =================
 const members = [
- {name:"OIC Dayarathna",rank:"OIC",skills:["Guard Room","Goods Receiving"],blocked:["CCTV New","CCTV Old"]},
- {name:"OIC Asanka",rank:"OIC",skills:["Main Gate","Goods Receiving"],blocked:["2B"]},
- {name:"OIC Kumara",rank:"OIC",skills:["Guard Room","Time Office"]},
- {name:"OIC Samaranayaka",rank:"OIC",skills:["CCTV Old","CCTV New"]},
- {name:"OIC Wijethunga",rank:"OIC",skills:["CCTV Old","CCTV New","Guard Room"]},
- {name:"OIC Rangana",rank:"OIC",skills:["CCTV Old","CCTV New","Goods Receiving"]},
- {name:"OIC Sampath",rank:"OIC",skills:["CCTV Old","CCTV New"]},
- {name:"OIC Suresh",rank:"OIC",skills:["Guard Room","Goods Receiving"],blocked:["2B"]},
- {name:"OIC Mendis",rank:"OIC",skills:["CCTV Old","CCTV New","Guard Room"]}
+  {name:"Dayarathna", skills:["Guard Room","Goods Receiving"], blocked:["CCTV New","CCTV Old"]},
+  {name:"Asanka", skills:["Main Gate","Goods Receiving"], blocked:["2B"]},
+  {name:"Kumara", skills:["Guard Room","Time Office"]},
+  {name:"Samaranayaka", skills:["CCTV Old","CCTV New"]},
+  {name:"Wijethunga", skills:["CCTV Old","CCTV New","Guard Room"]},
+  {name:"Rangana", skills:["CCTV Old","CCTV New","Goods Receiving"]},
+  {name:"Sampath", skills:["CCTV Old","CCTV New"]},
+  {name:"Suresh", skills:["Guard Room","Goods Receiving"], blocked:["2B"]},
+  {name:"Mendis", skills:["CCTV Old","CCTV New","Guard Room"]}
 ];
 
 // ================= POINTS =================
-const dutyPoints = [
- "Guard Room",
- "Goods Receiving",
- "CCTV New",
- "CCTV Old",
- "Main Gate",
- "Time Office"
+const points = [
+  "Guard Room",
+  "Goods Receiving",
+  "CCTV New",
+  "CCTV Old",
+  "Main Gate",
+  "Time Office",
+  "2B"
 ];
 
-// ================= INIT =================
-function init(){
-attendance.innerHTML = members.map(m=>`
-<div class="row name">
-  <span>${m.name} <span class="badge">${m.rank}</span></span>
-  <input type="checkbox" class="att" data-name="${m.name}">
-</div>`).join("");
-loadAttendance();
-}
-init();
+// ================= LOAD STAFF =================
+function loadStaff() {
+  let html="";
+  members.forEach(m=>{
+    html+=`<div class="member">👮 ${m.name}</div>`;
+  });
+  document.getElementById("members").innerHTML=html;
 
-// ================= NAV =================
-function goStep(n){
-document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-document.getElementById("step"+n).classList.add("active");
-if(n===2) renderPoints();
-window.scrollTo(0,0);
-}
+  let day="", night="";
+  members.forEach(m=>{
+    day+=`<label class="member">
+      <input type="checkbox" class="dayCheck" value="${m.name}"> ${m.name}
+    </label>`;
+    night+=`<label class="member">
+      <input type="checkbox" class="nightCheck" value="${m.name}"> ${m.name}
+    </label>`;
+  });
 
-// ================= FILTER =================
-function filterNames(v){
-document.querySelectorAll(".name").forEach(r=>{
-r.style.display=r.innerText.toLowerCase().includes(v.toLowerCase())?"":"none";
-});
+  document.getElementById("dayAttendance").innerHTML=day;
+  document.getElementById("nightAttendance").innerHTML=night;
 }
+loadStaff();
 
-// ================= ATTENDANCE =================
-function saveAttendance(){
-const shift = document.getElementById("shift").value;
-const list=[...document.querySelectorAll(".att:checked")].map(c=>c.dataset.name);
-localStorage.setItem("attendance_"+shift,JSON.stringify(list));
-alert(shift+" attendance saved");
-}
-
-function loadAttendance(){
-const shift=document.getElementById("shift").value;
-const saved=JSON.parse(localStorage.getItem("attendance_"+shift)||"[]");
-document.querySelectorAll(".att").forEach(c=>{
-c.checked = saved.includes(c.dataset.name);
-});
-}
-
-// ================= CORE FILTER =================
-function allowed(point,people){
-return people.filter(p=>{
-if(p.blocked && p.blocked.includes(point)) return false;
-if(!p.skills.includes(point)) return false;
-return true;
-});
+// ================= FILTER ENGINE =================
+function allowedPeople(point, presentNames) {
+  return members.filter(m=>{
+    if(!presentNames.includes(m.name)) return false;
+    if(m.blocked && m.blocked.includes(point)) return false;
+    return m.skills.includes(point);
+  });
 }
 
 // ================= RENDER POINTS =================
-function renderPoints(){
-const shift=document.getElementById("shift").value;
-shiftLabel.innerText = "SHIFT : " + shift;
+function renderPoints(shift) {
+  const checks = document.querySelectorAll(
+    shift==="day" ? ".dayCheck:checked" : ".nightCheck:checked"
+  );
+  const presentNames = [...checks].map(c=>c.value);
 
-const presentNames=JSON.parse(localStorage.getItem("attendance_"+shift)||"[]");
-const presentPeople=members.filter(m=>presentNames.includes(m.name));
+  let html="";
+  points.forEach(p=>{
+    const allowed = allowedPeople(p,presentNames);
+    html+=`
+      <div class="point">
+        <b>${p}</b><br>
+        <select>
+          <option value="">-- Select --</option>
+          ${
+            allowed.length
+            ? allowed.map(a=>`<option>${a.name}</option>`).join("")
+            : `<option disabled>❌ No suitable person</option>`
+          }
+        </select>
+      </div>`;
+  });
 
-points.innerHTML = dutyPoints.map(pt=>{
-const ok=allowed(pt,presentPeople);
-const last=localStorage.getItem(shift+"_last_"+pt)||"නැත";
-return `
-<div class="point">
-  <div class="title">${pt}</div>
-  <div class="last">Last (${shift}): ${last}</div>
-  <select data-point="${pt}">
-    <option value="">-- select --</option>
-    ${
-      ok.length
-      ? ok.map(o=>`<option value="${o.name}">${o.name}</option>`).join("")
-      : `<option disabled>❌ No suitable person</option>`
-    }
-  </select>
-</div>`;
-}).join("");
+  document.getElementById("points").innerHTML=html;
 }
 
 // ================= AUTO ASSIGN =================
-function autoAssign(){
-let used=[];
-document.querySelectorAll("select").forEach(s=>{
-const opts=[...s.options].map(o=>o.value).filter(v=>v && !used.includes(v));
-if(opts[0]){
-s.value=opts[0];
-used.push(opts[0]);
-}
-});
-}
-
-// ================= TEXT =================
-function buildText(){
-const shift=document.getElementById("shift").value;
-let t=`*IRONSHIELD DUTY ROSTER – ${shift}*\n\n`;
-document.querySelectorAll("select").forEach(s=>{
-if(s.value){
-t+=`📍 ${s.dataset.point} : ${s.value}\n`;
-localStorage.setItem(shift+"_last_"+s.dataset.point,s.value);
-}
-});
-return t;
-}
-
-// ================= SHARE =================
-function sendWA(){
-window.open("https://wa.me/?text="+encodeURIComponent(buildText()));
-}
-function copyText(){
-navigator.clipboard.writeText(buildText());
-alert("Copied");
+function autoAssign() {
+  let used=[];
+  document.querySelectorAll("#points select").forEach(sel=>{
+    for(let opt of sel.options){
+      if(opt.value && !used.includes(opt.value)){
+        sel.value=opt.value;
+        used.push(opt.value);
+        break;
+      }
+    }
+  });
 }
 </script>
 
