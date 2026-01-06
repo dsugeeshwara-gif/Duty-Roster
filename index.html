@@ -2,15 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Security Duty Roster System</title>
+<title>Security Duty Assignment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body { font-family: Arial; background:#f4f6f8; padding:20px }
-h2 { margin-top:30px }
-.box { background:#fff; padding:15px; margin-bottom:20px; border-radius:8px }
-.member { display:inline-block; width:220px }
-.point { margin-bottom:10px }
-select { padding:5px; width:200px }
-button { padding:10px 15px; margin-top:10px }
+body { font-family: Arial; background:#f2f4f7; padding:15px }
+h1,h2 { margin:10px 0 }
+.box {
+  background:#fff;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:8px;
+}
+.member {
+  display:inline-block;
+  width:45%;
+  margin-bottom:5px;
+}
+.point {
+  margin-bottom:12px;
+}
+select {
+  width:100%;
+  padding:6px;
+}
+button {
+  padding:8px 12px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -18,24 +37,25 @@ button { padding:10px 15px; margin-top:10px }
 
 <h1>Security Duty Assignment</h1>
 
-<!-- MEMBERS -->
+<!-- ALL STAFF -->
 <div class="box">
 <h2>All Staff</h2>
 <div id="members"></div>
 </div>
 
-<!-- DAY ATTENDANCE -->
+<!-- SHIFT SELECT -->
 <div class="box">
-<h2>Day Shift Attendance</h2>
-<div id="dayAttendance"></div>
-<button onclick="renderPoints('day')">Load Day Points</button>
+<h2>Select Shift</h2>
+<label><input type="radio" name="shift" value="day" checked onchange="updatePoints()"> Day</label>
+<label style="margin-left:15px">
+  <input type="radio" name="shift" value="night" onchange="updatePoints()"> Night
+</label>
 </div>
 
-<!-- NIGHT ATTENDANCE -->
+<!-- ATTENDANCE -->
 <div class="box">
-<h2>Night Shift Attendance</h2>
-<div id="nightAttendance"></div>
-<button onclick="renderPoints('night')">Load Night Points</button>
+<h2>Attendance</h2>
+<div id="attendance"></div>
 </div>
 
 <!-- POINTS -->
@@ -46,102 +66,95 @@ button { padding:10px 15px; margin-top:10px }
 </div>
 
 <script>
-// ================= STAFF DATABASE =================
+// ================= STAFF =================
 const members = [
-  {name:"Dayarathna", skills:["Guard Room","Goods Receiving"], blocked:["CCTV New","CCTV Old"]},
-  {name:"Asanka", skills:["Main Gate","Goods Receiving"], blocked:["2B"]},
-  {name:"Kumara", skills:["Guard Room","Time Office"]},
-  {name:"Samaranayaka", skills:["CCTV Old","CCTV New"]},
-  {name:"Wijethunga", skills:["CCTV Old","CCTV New","Guard Room"]},
-  {name:"Rangana", skills:["CCTV Old","CCTV New","Goods Receiving"]},
-  {name:"Sampath", skills:["CCTV Old","CCTV New"]},
-  {name:"Suresh", skills:["Guard Room","Goods Receiving"], blocked:["2B"]},
-  {name:"Mendis", skills:["CCTV Old","CCTV New","Guard Room"]}
+ {name:"Dayarathna", skills:["Guard Room","Goods Receiving"], blocked:["CCTV New","CCTV Old"]},
+ {name:"Asanka", skills:["Main Gate","Goods Receiving"], blocked:["2B"]},
+ {name:"Kumara", skills:["Guard Room","Time Office"]},
+ {name:"Samaranayaka", skills:["CCTV Old","CCTV New"]},
+ {name:"Wijethunga", skills:["CCTV Old","CCTV New","Guard Room"]},
+ {name:"Rangana", skills:["CCTV Old","CCTV New","Goods Receiving"]},
+ {name:"Sampath", skills:["CCTV Old","CCTV New"]},
+ {name:"Suresh", skills:["Guard Room","Goods Receiving"], blocked:["2B"]},
+ {name:"Mendis", skills:["CCTV Old","CCTV New","Guard Room"]}
 ];
 
 // ================= POINTS =================
 const points = [
-  "Guard Room",
-  "Goods Receiving",
-  "CCTV New",
-  "CCTV Old",
-  "Main Gate",
-  "Time Office",
-  "2B"
+ "Guard Room",
+ "Goods Receiving",
+ "CCTV New",
+ "CCTV Old",
+ "Main Gate",
+ "Time Office",
+ "2B"
 ];
 
 // ================= LOAD STAFF =================
 function loadStaff() {
-  let html="";
-  members.forEach(m=>{
-    html+=`<div class="member">👮 ${m.name}</div>`;
-  });
-  document.getElementById("members").innerHTML=html;
-
-  let day="", night="";
-  members.forEach(m=>{
-    day+=`<label class="member">
-      <input type="checkbox" class="dayCheck" value="${m.name}"> ${m.name}
+ let mHTML="", aHTML="";
+ members.forEach(m=>{
+   mHTML += `👮 ${m.name}<br>`;
+   aHTML += `
+    <label class="member">
+      <input type="checkbox" class="present" value="${m.name}" onchange="updatePoints()"> ${m.name}
     </label>`;
-    night+=`<label class="member">
-      <input type="checkbox" class="nightCheck" value="${m.name}"> ${m.name}
-    </label>`;
-  });
-
-  document.getElementById("dayAttendance").innerHTML=day;
-  document.getElementById("nightAttendance").innerHTML=night;
+ });
+ document.getElementById("members").innerHTML = mHTML;
+ document.getElementById("attendance").innerHTML = aHTML;
 }
 loadStaff();
 
-// ================= FILTER ENGINE =================
-function allowedPeople(point, presentNames) {
-  return members.filter(m=>{
-    if(!presentNames.includes(m.name)) return false;
-    if(m.blocked && m.blocked.includes(point)) return false;
-    return m.skills.includes(point);
-  });
+// ================= FILTER =================
+function allowedPeople(point, present) {
+ return members.filter(m=>{
+   if(!present.includes(m.name)) return false;
+   if(m.blocked && m.blocked.includes(point)) return false;
+   return m.skills.includes(point);
+ });
 }
 
-// ================= RENDER POINTS =================
-function renderPoints(shift) {
-  const checks = document.querySelectorAll(
-    shift==="day" ? ".dayCheck:checked" : ".nightCheck:checked"
-  );
-  const presentNames = [...checks].map(c=>c.value);
+// ================= UPDATE POINTS =================
+function updatePoints() {
+ const present =
+  [...document.querySelectorAll(".present:checked")]
+  .map(c=>c.value);
 
-  let html="";
-  points.forEach(p=>{
-    const allowed = allowedPeople(p,presentNames);
-    html+=`
-      <div class="point">
-        <b>${p}</b><br>
-        <select>
-          <option value="">-- Select --</option>
-          ${
-            allowed.length
-            ? allowed.map(a=>`<option>${a.name}</option>`).join("")
-            : `<option disabled>❌ No suitable person</option>`
-          }
-        </select>
-      </div>`;
-  });
-
-  document.getElementById("points").innerHTML=html;
+ let html="";
+ points.forEach(p=>{
+   const allowed = allowedPeople(p,present);
+   html += `
+    <div class="point">
+      <b>${p}</b>
+      <select>
+        <option value="">-- Select --</option>
+        ${
+          allowed.length
+          ? allowed.map(a=>`<option>${a.name}</option>`).join("")
+          : `<option disabled>❌ No suitable staff</option>`
+        }
+      </select>
+    </div>`;
+ });
+ document.getElementById("points").innerHTML = html;
 }
 
 // ================= AUTO ASSIGN =================
 function autoAssign() {
-  let used=[];
-  document.querySelectorAll("#points select").forEach(sel=>{
-    for(let opt of sel.options){
-      if(opt.value && !used.includes(opt.value)){
-        sel.value=opt.value;
-        used.push(opt.value);
-        break;
-      }
-    }
-  });
+ let used=[];
+ document.querySelectorAll("#points select").forEach(sel=>{
+   for(let opt of sel.options){
+     if(opt.value && !used.includes(opt.value)){
+       sel.value = opt.value;
+       used.push(opt.value);
+       break;
+     }
+   }
+ });
 }
+
+// initial render
+updatePoints();
 </script>
 
 </body>
