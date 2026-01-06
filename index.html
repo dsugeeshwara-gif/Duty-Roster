@@ -3,103 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender Security - Duty System</title>
+    <title>IronShield Defender Security - Full Pro System</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #1a237e; border-bottom: 3px solid #1a237e; padding-bottom: 10px; }
-        .point-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fafafa; }
-        .point-name { font-weight: bold; font-size: 1.1em; color: #d32f2f; margin-bottom: 8px; }
-        .recommendation { font-size: 0.85em; color: #555; margin-bottom: 10px; background: #e8f5e9; padding: 5px; border-radius: 4px; }
-        select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #999; }
-        .history-tag { font-size: 0.8em; color: #ef6c00; font-style: italic; margin-top: 5px; display: block; }
-        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
-        button { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-next { background: #1a237e; color: white; }
-        .btn-print { background: #2e7d32; color: white; width: 100%; margin-top: 20px; font-size: 1.1em; }
-        @media print { .no-print { display: none; } .container { box-shadow: none; border: none; } }
+        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef2f7; margin: 0; padding: 10px; line-height: 1.6; }
+        .pro-container { max-width: 700px; margin: auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .header { background: var(--primary); color: white; text-align: center; padding: 25px; }
+        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; }
+        .step-box { padding: 15px; background: #fffde7; border-bottom: 2px solid #fbc02d; font-size: 14px; color: #444; }
+        .duty-section { padding: 20px; display: none; }
+        .duty-section.active { display: block; }
+        .point-row { margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .point-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .point-name { font-weight: bold; color: var(--secondary); font-size: 16px; }
+        .rec-tag { font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .history-info { font-size: 12px; color: #777; margin-bottom: 8px; font-style: italic; }
+        input { width: 100%; padding: 14px; border-radius: 8px; border: 2px solid #ddd; font-size: 16px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; background: #fdfdfd; }
+        .nav-bar { display: flex; gap: 10px; padding: 20px; background: #f9f9f9; border-top: 1px solid #eee; }
+        button { flex: 1; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 15px; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-prev { background: #eee; color: #555; }
+        .btn-print { background: var(--success); color: white; width: calc(100% - 40px); margin: 0 20px 20px; font-size: 18px; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        @media print { .no-print { display: none !important; } .pro-container { box-shadow: none; width: 100%; max-width: 100%; } .duty-section { display: block !important; padding: 10px; } .point-row { page-break-inside: avoid; margin-bottom: 15px; } h3 { color: black; border-bottom: 1px solid #000; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>IRONSHIELD DEFENDER SECURITY</h1>
-    <h3 style="text-align: center;">Daily Duty Roster</h3>
-
-    <div id="setup-section" class="no-print">
-        <p><strong>පියවර 1:</strong> අද දින රාජකාරි කරන නිලධාරීන්ගේ නම්/අංක මතක තබා ගන්න.</p>
-        <p><strong>පියවර 2:</strong> එක් එක් පොයින්ට් එකට අදාළ නිලධාරියා තෝරන්න. (කලින් සිටි ස්ථානය යෝජනා කරනු ඇත).</p>
+<div class="pro-container">
+    <div class="header">
+        <h1>IRONSHIELD DEFENDER SECURITY</h1>
+        <p>Professional Hospital Duty Management System</p>
     </div>
 
-    <form id="dutyForm">
-        <div id="points-container">
-            </div>
+    <div class="step-box no-print">
+        <b>උපදෙස්:</b> නිලධාරියාගේ නම තෝරන්න. ලැයිස්තුවේ නැති අයෙක් නම් නම ටයිප් කරන්න. එක් එක් පියවර අවසානයේ "Next" ඔබන්න.
+    </div>
 
-        <button type="button" class="btn-print no-print" onclick="window.print()">Print / Save PDF</button>
-    </form>
+    <div id="sec1" class="duty-section active">
+        <h3>පියවර 1: ප්‍රධාන පාලන මධ්‍යස්ථාන</h3>
+        <div id="group1"></div>
+        <div class="nav-bar no-print">
+            <button class="btn-next" onclick="showSec(2)">මීළඟ පියවර (Next) ➔</button>
+        </div>
+    </div>
+
+    <div id="sec2" class="duty-section">
+        <h3>පියවර 2: වෛද්‍ය අංශ සහ අභ්‍යන්තර</h3>
+        <div id="group2"></div>
+        <div class="nav-bar no-print">
+            <button class="btn-prev" onclick="showSec(1)">⬅ ආපසු (Back)</button>
+            <button class="btn-next" onclick="showSec(3)">මීළඟ පියවර (Next) ➔</button>
+        </div>
+    </div>
+
+    <div id="sec3" class="duty-section">
+        <h3>පියවර 3: නේවාසිකාගාර සහ පිටත කලාප</h3>
+        <div id="group3"></div>
+        <div class="nav-bar no-print">
+            <button class="btn-prev" onclick="showSec(2)">⬅ ආපසු (Back)</button>
+        </div>
+        <button class="btn-print no-print" onclick="window.print()">Print / Save Duty Roster</button>
+    </div>
 </div>
 
 <script>
-    // පොයින්ට් 42 ක ලැයිස්තුව
-    const points = [
-        { id: 1, name: "1. Guard Room - Post 01", rec: "OIC (1-10)" },
-        { id: 2, name: "2. Guard Room - Post 02", rec: "OIC (1-10)" },
-        { id: 3, name: "3. M/E Entry - 01", rec: "SSO/JSO" },
-        { id: 4, name: "4. M/E Entry - 02", rec: "SSO/JSO" },
-        { id: 5, name: "5. Time Office", rec: "LSO/LOIC (Bag Check)" },
-        { id: 13, name: "13. Pharmacy - Main", rec: "Nandalatha, Shanthi, Nandani, Sriyalatha" },
-        { id: 16, name: "16. CCTV New - 01", rec: "4, 7, 8, 9, 10, 11, 16, 19, 23 (Night: Female)" },
-        { id: 21, name: "21. Rounds - 01", rec: "All OIC Officers" },
-        { id: 24, name: "24. Kitchen", rec: "Day: OIC / Night: Any" },
-        { id: 25, name: "25. Main Gate", rec: "LOIC (Rita/Malkanthi), SSO Jayalath/Ravi" },
-        { id: 38, name: "38. Hostel - New", rec: "JSO Lokubanda (25), Sunil (26)" }
-        // මෙහි ඉතිරි පොයින්ට් 42ම ඇතුලත් කර ඇත...
+    const allPoints = [
+        { id: 1, name: "1. Guard Room - Post 01", rec: "OIC", g: 1 },
+        { id: 2, name: "2. Guard Room - Post 02", rec: "OIC", g: 1 },
+        { id: 3, name: "3. Main Entrance - 01", rec: "OIC/SSO", g: 1 },
+        { id: 4, name: "4. Main Entrance - 02", rec: "OIC/SSO", g: 1 },
+        { id: 5, name: "5. Time Office", rec: "LSO/LOIC", g: 1 },
+        { id: 6, name: "6. B/C/P - Post 01", rec: "SSO/JSO", g: 1 },
+        { id: 7, name: "7. B/C/P - Post 02", rec: "SSO/JSO", g: 1 },
+        { id: 8, name: "8. Glass Door", rec: "SSO/JSO/LSO", g: 1 },
+        { id: 9, name: "9. Lobby - Post 01", rec: "SSO/JSO", g: 1 },
+        { id: 10, name: "10. Lobby - Post 02", rec: "SSO/JSO", g: 1 },
+        { id: 11, name: "11. C/P/R", rec: "SSO/JSO", g: 1 },
+        { id: 12, name: "12. Doctors' Lift", rec: "JSO", g: 1 },
+        { id: 13, name: "13. Pharmacy - Main", rec: "LSO", g: 2 },
+        { id: 14, name: "14. Pharmacy - OPD", rec: "LSO", g: 2 },
+        { id: 15, name: "15. Pharmacy - Hospital", rec: "Helper", g: 2 },
+        { id: 16, name: "16. CCTV New - 01", rec: "Night Only LOIC", g: 2 },
+        { id: 17, name: "17. CCTV New - 02", rec: "OIC/SSO", g: 2 },
+        { id: 18, name: "18. C/P/03", rec: "JSO 25/26", g: 3 },
+        { id: 19, name: "19. C/P/04", rec: "JSO 25/26", g: 3 },
+        { id: 20, name: "20. Commercial Hostel", rec: "SSO/JSO", g: 3 },
+        { id: 21, name: "21. Rounds - 01", rec: "OIC", g: 1 },
+        { id: 22, name: "22. Rounds - 02", rec: "OIC", g: 1 },
+        { id: 23, name: "23. Kitchen Stores", rec: "OIC (Day)", g: 2 },
+        { id: 24, name: "24. Kitchen", rec: "Any Rank", g: 2 },
+        { id: 25, name: "25. Main Gate", rec: "SSO/LOIC", g: 3 },
+        { id: 26, name: "26. 2nd Basement", rec: "JSO", g: 3 },
+        { id: 27, name: "27. SICU", rec: "SSO/LSO", g: 2 },
+        { id: 28, name: "28. MICU", rec: "SSO/LSO", g: 2 },
+        { id: 29, name: "29. CCTV Old - 01", rec: "OIC/SSO", g: 2 },
+        { id: 30, name: "30. CCTV Old - 02", rec: "OIC/SSO", g: 2 },
+        { id: 31, name: "31. Lift Lobby - 3rd Fl", rec: "LSO", g: 2 },
+        { id: 32, name: "32. Lift Lobby - 4th Fl", rec: "LSO", g: 2 },
+        { id: 33, name: "33. Lift Lobby - 5th Fl", rec: "LSO", g: 2 },
+        { id: 34, name: "34. Lift Lobby - 6th Fl", rec: "LSO", g: 2 },
+        { id: 35, name: "35. Fort City", rec: "SSO/JSO", g: 3 },
+        { id: 36, name: "36. Lady Hostel - New", rec: "LSO", g: 3 },
+        { id: 37, name: "37. Hostel - Old", rec: "JSO 25/26", g: 3 },
+        { id: 38, name: "38. Hostel - New", rec: "JSO 25/26", g: 3 },
+        { id: 39, name: "39. Layanal Area", rec: "JSO", g: 3 },
+        { id: 40, name: "40. Bambalapitiya Area", rec: "JSO", g: 3 },
+        { id: 41, name: "41. Dilan Area", rec: "JSO", g: 3 },
+        { id: 42, name: "42. Receiving", rec: "SSO", g: 1 }
     ];
 
-    // සම්පූර්ණ නිලධාරී ලැයිස්තුව
-    const officers = [
-        "OIC Asanka (1)", "OIC Kumara (2)", "OIC Suranjith (3)", "OIC Samaranayake (4)", 
-        "SSO Tharaka (11)", "SSO Jayalath (12)", "JSO Lokubanda (25)", "JSO Sunil (26)",
-        "LOIC Rita (27)", "LSO Nandani (28)", "LSO Shanthi (32)"
-        // අනෙක් සියලුම නම් මෙයට එක් කළ හැක...
-    ];
+    function showSec(num) {
+        document.querySelectorAll('.duty-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec' + num).classList.add('active');
+        window.scrollTo(0,0);
+    }
 
-    function init() {
-        const container = document.getElementById('points-container');
-        points.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'point-card';
-            card.innerHTML = `
-                <div class="point-name">${p.name}</div>
-                <div class="recommendation no-print">නිර්දේශිතයි: ${p.rec}</div>
-                <select onchange="saveHistory(this, '${p.name}')">
-                    <option value="">-- නිලධාරියා තෝරන්න --</option>
-                    ${officers.map(o => `<option value="${o}">${o}</option>).join('')}
-                    <option value="other">වෙනත් නිලධාරියෙක් (Manual)</option>
-                </select>
-                <span class="history-tag no-print" id="hist-${p.id}"></span>
+    function render() {
+        allPoints.forEach(p => {
+            const last = localStorage.getItem('hist_'+p.id) || "පෙර දත්ත නැත";
+            const row = document.createElement('div');
+            row.className = 'point-row';
+            row.innerHTML = `
+                <div class="point-header">
+                    <span class="point-name">${p.name}</span>
+                    <span class="rec-tag no-print">${p.rec}</span>
+                </div>
+                <div class="history-info no-print">කලින් සිටියේ: ${last}</div>
+                <input type="text" placeholder="නිලධාරියාගේ නම/අංකය ඇතුළත් කරන්න" 
+                    onchange="localStorage.setItem('hist_${p.id}', this.value)">
             `;
-            container.appendChild(card);
+            document.getElementById('group' + p.g).appendChild(row);
         });
     }
-
-    function saveHistory(select, pointName) {
-        if(select.value === "other") {
-            const manualName = prompt("නිලධාරියාගේ නම ඇතුළත් කරන්න:");
-            if(manualName) {
-                const opt = document.createElement('option');
-                opt.value = manualName;
-                opt.text = manualName;
-                opt.selected = true;
-                select.add(opt);
-            }
-        }
-        // මීළඟ වතාවට මතක තබා ගැනීමට Local Storage භාවිතා කරයි
-        localStorage.setItem(pointName, select.value);
-    }
-
-    window.onload = init;
+    render();
 </script>
-
 </body>
 </html>
