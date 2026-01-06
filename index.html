@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender Security</title>
+    <title>IronShield Defender - Professional System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
         
-        /* Header & Settings Gear */
-        .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .settings-dropdown { position: relative; }
-        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 250px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 1001; margin-top: 10px; }
-        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee; }
-        .show { display: block; }
-
-        .container { max-width: 550px; margin: 20px auto; padding: 0 15px; }
-        .step-panel { display: none; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .container { max-width: 600px; margin: auto; padding: 15px; padding-bottom: 100px; }
+        
+        .step-panel { display: none; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .step-panel.active { display: block; }
         
-        .scroll-area { max-height: 60vh; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
-
-        /* Point Card Style (Image 4351 ට අනුව) */
-        .point-card { border: 1.5px solid #dee2e6; border-radius: 10px; padding: 15px; margin-bottom: 20px; background: #fff; }
-        .point-title { color: #c0392b; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
+        /* සම්පූර්ණ ලැයිස්තුව Scroll කිරීමට */
+        .scroll-area { max-height: 70vh; overflow-y: auto; padding-right: 5px; margin-bottom: 20px; }
         
-        /* Toggles inside Point (Image 4349 ට අනුව) */
-        .name-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0; }
+        .point-card { border: 2px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 20px; background: #fff; }
+        .point-title { font-weight: bold; color: var(--secondary); margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
-        /* Buttons */
-        .btn-group { display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; font-size: 16px; }
+        
+        /* Footer Buttons */
+        .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: center; z-index: 1000; }
+        .btn { width: 90%; max-width: 500px; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .btn-next { background: var(--primary); color: white; }
         .btn-wa { background: var(--success); color: white; }
-        .btn-back { background: #d1d1d1; color: #333; }
 
         /* Toggle Switch */
         .switch { position: relative; width: 44px; height: 22px; }
@@ -48,58 +42,51 @@
 <body>
 
 <div class="header">
-    <div style="font-weight: bold; font-size: 18px;">IRONSHIELD DEFENDER</div>
-    <div class="settings-dropdown">
-        <i class="fas fa-cog fa-lg" onclick="toggleSettings()" style="cursor: pointer;"></i>
-        <div id="settingsMenu" class="dropdown-content">
-            <a href="#" onclick="alert('පොයින්ට් එකතු කිරීම මෙතැනින්...')">➕ රාජකාරි ස්ථාන එක් කරන්න</a>
-            <a href="#" onclick="alert('නිලධාරීන් එක් කිරීම මෙතැනින්...')">👤 නිලධාරීන් එක් කරන්න</a>
-            <a href="#" onclick="location.reload()" style="color: red;">🔄 පද්ධතිය Reset කරන්න</a>
-        </div>
-    </div>
+    <div style="font-weight: bold; letter-spacing: 1px;">IRONSHIELD DEFENDER</div>
+    <i class="fas fa-cog fa-lg" onclick="location.reload()" style="cursor: pointer;"></i>
 </div>
 
 <div class="container">
     <div id="step1" class="step-panel active">
-        <h3 style="color: var(--primary);">2. අද පැමිණ සිටින අය (Attendance)</h3>
-        <div id="attendance-list" class="scroll-area">
+        <h3 style="color:var(--primary);"><i class="fas fa-user-check"></i> 1. අද පැමිණ සිටින අය</h3>
+        <div id="att-list" class="scroll-area">
             </div>
-        <div class="btn-group">
-            <button class="btn btn-back">ආපසු</button>
-            <button class="btn btn-next" onclick="showStep2()">ඩියුටි බෙදාදීමට (Next) ➔</button>
+        <div class="footer">
+            <button class="btn btn-next" onclick="goToStep2()">ඩියුටි බෙදාදීමට (Next) ➔</button>
         </div>
     </div>
 
     <div id="step2" class="step-panel">
-        <h3 style="color: var(--primary);">2. රාජකාරි ස්ථාන (සියල්ල)</h3>
-        <div id="points-container" class="scroll-area">
+        <h3 style="color:var(--primary);"><i class="fas fa-map-marker-alt"></i> 2. රාජකාරි ස්ථාන (පොයින්ට් 42)</h3>
+        <div id="point-list" class="scroll-area">
             </div>
-        <div class="btn-group">
-            <button class="btn btn-back" onclick="showStep1()">ආපසු</button>
-            <button class="btn btn-wa" onclick="sendToWhatsApp()">WhatsApp යවන්න 📱</button>
+        <div class="footer" style="flex-direction: column; gap: 8px;">
+            <button class="btn btn-wa" onclick="sendWhatsApp()">WhatsApp හරහා යවන්න 📱</button>
+            <button class="btn" style="background:#eee; color:#333; width: 90%;" onclick="goToStep1()">ආපසු</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ඔබ ලබාදුන් සාමාජික නාමලේඛනය
-    const members = ["OIC Asanka", "OIC Kumara", "SSO Tharaka", "SSO Jayalath", "JSO Lokubanda", "LOIC Rita", "LSO Nandani"];
-    
-    // ඔබ ලබාදුන් පොයින්ට් 42
-    const points = [
-        "Main Entrance", "Guard Room 01", "CCTV Room", "Pharmacy", "Lobby", 
-        "Back Gate", "Admin Block", "Vehicle Parking", "Point 09", "Point 10"
-        // මෙලෙස 42ක් දක්වා ඔබට අවශ්‍ය නම් එකතු කරගත හැක
+    // නිලධාරීන් 35 දෙනා
+    const members = [
+        "OIC Asanka", "OIC Kumara", "OIC Suranjith", "OIC Samaranayake", "OIC Dayarathne",
+        "OIC Suresh", "OIC Mendis", "OIC Vijithalal", "OIC Rangana", "OIC Sampath",
+        "SSO Tharaka", "SSO Jayalath", "SSO Viresh", "SSO Ravi", "SSO Ajith",
+        "SSO Manusha", "SSO Rathnadasa", "JSO Prasanna", "JSO Pradeep", "JSO Chandana",
+        "JSO Wijerathne", "JSO Raj", "JSO Dinesh", "JSO Ravindu", "JSO Lokubanda",
+        "JSO Sunil", "LOIC Rita", "LSO Nandani", "LSO Seelawathi", "LSO Nalani",
+        "LSO Wimalasooriya", "LSO Shanthi", "LSO Nandawathi", "LSO Dilani", "LSO Sriyalatha"
     ];
 
-    function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('show'); }
+    // පොයින්ට් 42
+    const points = Array.from({length: 42}, (_, i) => `රාජකාරි ස්ථානය ${i + 1}`);
 
-    // පියවර 1 ලැයිස්තුව සැකසීම
-    function initAttendance() {
-        const list = document.getElementById('attendance-list');
-        list.innerHTML = members.map(m => `
-            <div class="name-row">
-                <span>${m}</span>
+    function init() {
+        const attArea = document.getElementById('att-list');
+        attArea.innerHTML = members.map(m => `
+            <div class="item-row">
+                <span style="font-weight:500;">${m}</span>
                 <label class="switch">
                     <input type="checkbox" checked class="att-check" data-name="${m}">
                     <span class="slider"></span>
@@ -107,41 +94,45 @@
             </div>`).join('');
     }
 
-    function showStep1() {
+    function goToStep1() {
         document.getElementById('step2').classList.remove('active');
         document.getElementById('step1').classList.add('active');
+        window.scrollTo(0,0);
     }
 
-    // පියවර 2: පොයින්ට් යටතේ නම් පෙන්වීම (Page-2 උපදෙස් අනුව)
-    function showStep2() {
-        const presentOnes = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
-        if(presentOnes.length === 0) return alert("කරුණාකර අවම වශයෙන් එක් අයෙකු තෝරන්න.");
-
+    function goToStep2() {
+        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
+        if(present.length === 0) { alert("කරුණාකර අවම වශයෙන් එක් අයෙකු හෝ තෝරන්න."); return; }
+        
         document.getElementById('step1').classList.remove('active');
         document.getElementById('step2').classList.add('active');
-
-        const container = document.getElementById('points-container');
-        container.innerHTML = points.map(p => `
+        
+        const pList = document.getElementById('point-list');
+        pList.innerHTML = points.map(p => `
             <div class="point-card">
                 <div class="point-title">${p}</div>
-                <div class="names-under-point">
-                    <select class="duty-select" data-point="${p}" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc;">
-                        <option value="">-- නිලධාරියා තෝරන්න --</option>
-                        ${presentOnes.map(name => `<option value="${name}">${name}</option>`).join('')}
-                    </select>
-                </div>
+                <select class="duty-sel" data-point="${p}">
+                    <option value="">-- නිලධාරියා තෝරන්න --</option>
+                    ${present.map(m => `<option value="${m}">${m}</option>`).join('')}
+                </select>
             </div>`).join('');
+        window.scrollTo(0,0);
     }
 
-    function sendToWhatsApp() {
-        let text = "*IRONSHIELD DEFENDER - DUTY*\n\n";
-        document.querySelectorAll('.duty-select').forEach(sel => {
-            if(sel.value) text += `📍 *${sel.dataset.point}*: ${sel.value}\n`;
+    function sendWhatsApp() {
+        let msg = "*IRONSHIELD DEFENDER - OFFICIAL DUTY ROSTER*\n\n";
+        let hasData = false;
+        document.querySelectorAll('.duty-sel').forEach(s => {
+            if(s.value) {
+                msg += `📍 *${s.dataset.point}*: ${s.value}\n`;
+                hasData = true;
+            }
         });
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+        if(!hasData) return alert("කරුණාකර රාජකාරි ස්ථාන වලට නම් ඇතුළත් කරන්න.");
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
 
-    initAttendance();
+    init();
 </script>
 </body>
 </html>
