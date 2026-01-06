@@ -3,195 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender - Final Pro</title>
+    <title>IronShield Defender Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #1a237e; 
-            --secondary: #d32f2f; 
-            --success: #2e7d32; 
-            --bg: #f0f2f5; 
-            --card-bg: #ffffff;
-        }
+        :root { --primary: #1a237e; --secondary: #d32f2f; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+        .header { background: var(--primary); color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 100; }
         
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        .screen { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 18px; 
-            text-align: center; 
-            font-weight: 800; 
-            font-size: 22px; 
-            letter-spacing: 1px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3); 
-            flex-shrink: 0; 
-        }
+        /* Welcome Screen */
+        .shift-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .shift-btn { flex: 1; padding: 20px; border: 2px solid var(--primary); border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; }
+        .shift-btn.active-shift { background: var(--primary); color: white; }
 
-        .container { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding: 15px; 
-            -webkit-overflow-scrolling: touch; 
-        }
+        /* Search Bar */
+        .search-container { position: sticky; top: 75px; background: var(--bg); padding: 10px 0; z-index: 90; }
+        .search-bar { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
 
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-            border-left: 5px solid var(--primary);
-        }
+        /* List Items */
+        .card { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        input:checked + .slider { background-color: #2e7d32; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider:before { transform: translateX(26px); }
 
-        .point-title { 
-            color: var(--secondary); 
-            font-weight: bold; 
-            font-size: 16px; 
-            margin-bottom: 10px; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* Footer */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; border-top: 1px solid #ddd; display: flex; gap: 10px; box-sizing: border-box; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-next { background: var(--primary); color: white; }
+        .btn-add { background: #607d8b; color: white; }
 
-        select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            font-size: 15px;
-            outline: none;
-            cursor: pointer;
-            color: #333;
-        }
-
-        select:focus {
-            border-color: var(--primary);
-        }
-
-        .footer { 
-            background: white; 
-            padding: 15px; 
-            border-top: 1px solid #ddd; 
-            display: flex; 
-            gap: 10px; 
-            flex-shrink: 0; 
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-
-        .btn { 
-            flex: 1; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            font-size: 16px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            transition: 0.3s;
-        }
-
-        .btn-wa { background: var(--success); color: white; }
-        .btn-wa:active { background: #1e5e24; transform: scale(0.98); }
-        
-        .btn-reset { background: #eee; color: #333; }
-        .btn-reset:active { background: #ddd; transform: scale(0.98); }
+        .duty-point { background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--secondary); cursor: pointer; }
+        .assigned-tag { float: right; color: #2e7d32; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header"><i class="fas fa-shield-alt"></i> IRONSHIELD DEFENDER PRO</div>
+<div class="header">
+    <div id="app-title">IRONSHIELD DEFENDER PRO</div>
+</div>
 
-<div class="container" id="main-container">
+<div id="attendance-screen" class="screen active">
+    <div class="shift-box">
+        <div class="shift-btn active-shift" onclick="setShift('දිවා මුරය', this)">දිවා මුරය</div>
+        <div class="shift-btn" onclick="setShift('රාත්‍රී මුරය', this)">රාත්‍රී මුරය</div>
     </div>
 
-<div class="footer">
-    <button class="btn btn-reset" onclick="confirmReset()"><i class="fas fa-sync"></i> Reset</button>
-    <button class="btn btn-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> යවන්න</button>
+    <div class="search-container">
+        <input type="text" class="search-bar" id="staffSearch" placeholder="අංකය හෝ නම සොයන්න..." onkeyup="filterStaff()">
+    </div>
+
+    <div id="staff-list-container">
+        </div>
+
+    <div class="footer-nav">
+        <button class="btn btn-add" onclick="addNewStaff()"><i class="fas fa-plus"></i> අලුත් නිලධාරියෙක්</button>
+        <button class="btn btn-next" onclick="showDutyScreen()">මීළඟට <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<div id="duty-screen" class="screen">
+    <h3>ස්ථානය තෝරා නිලධාරියෙකු පත් කරන්න</h3>
+    <div id="duty-points-container">
+        </div>
+    <div class="footer-nav">
+        <button class="btn btn-add" onclick="backToAttendance()"><i class="fas fa-arrow-left"></i> ආපසු</button>
+        <button class="btn btn-next" style="background: #2e7d32;" onclick="generateReport()">WhatsApp යවන්න</button>
+    </div>
+</div>
+
+<div id="officerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:200; overflow-y:auto; padding:20px; box-sizing:border-box;">
+    <h3 style="color:white;">නිලධාරියෙකු තෝරන්න</h3>
+    <div id="available-officers-list"></div>
+    <button class="btn btn-add" style="width:100%; margin-top:20px;" onclick="closeModal()">අවලංගු කරන්න</button>
 </div>
 
 <script>
-    // නිලධාරීන් 35
-    const staffNames = [
-        "OIC Asanka", "OIC Kumara", "OIC Suranjith", "OIC Samaranayake", "OIC Dayarathne", "OIC Suresh", "OIC Mendis", "OIC Vijithalal", "OIC Rangana", "OIC Sampath",
-        "SSO Tharaka", "SSO Jayalath", "SSO Viresh", "SSO Ravi", "SSO Ajith", "SSO Manusha", "SSO Rathnadasa",
-        "JSO Prasanna", "JSO Pradeep", "JSO Chandana", "JSO Wijerathne", "JSO Raj", "JSO Dinesh", "JSO Ravindu", "JSO Lokubanda", "JSO Sunil",
-        "LOIC Rita", "LSO Nandani", "LSO Seelawathi", "LSO Nalani", "LSO Shanthi", "LSO Nandawathi", "LSO Dilani", "LSO Sriyalatha", "LSO Kumari"
+    let currentShift = "දිවා මුරය";
+    let staff = [
+        { id: "001", rank: "OIC", name: "Asanka", present: true },
+        { id: "002", rank: "SSO", name: "Tharaka", present: true },
+        { id: "003", rank: "JSO", name: "Prasanna", present: true },
+        { id: "004", rank: "LSO", name: "Nandani", present: true }
     ];
+    let points = ["Guard Room (Post 01)", "Main Entry", "Time Office", "CCTV Room", "Hostel Area"];
+    let assignments = {};
+    let activePoint = null;
 
-    // පොයින්ට් 42
-    const points = [
-        "1. Guard Room (Post 01)", "2. Guard Room (Post 02)", "3. M/E Entry (01)", "4. M/E Entry (02)", "5. Time Office",
-        "6. B/C/P (01)", "7. B/C/P (02)", "8. Glass Door", "9. Lobby (01)", "10. Lobby (02)", "11. C/P/R", "12. Doctors Lift",
-        "13. Pharmacy (Main)", "14. Pharmacy (OPD)", "15. Pharmacy (Helper)", "16. CCTV New (01)", "17. CCTV New (02)",
-        "18. C/P/03", "19. C/P/04", "20. Commercial Hostel", "21. Rounds (01)", "22. Rounds (02)", "23. Kitchen Stores",
-        "24. Kitchen", "25. Main Gate", "26. 2nd Basement", "27. SICU", "28. MICU", "29. CCTV Old (01)", "30. CCTV Old (02)",
-        "31. Lift Lobby-3F", "32. Lift Lobby-4F", "33. Lift Lobby-5F", "34. Lift Lobby-6F", "35. Fort City", "36. Lady Hostel New",
-        "37. Hostel Old", "38. Hostel New", "39. Layanal Banglow", "40. Bambalapitiya Area", "41. Dilan Banglow", "42. Receiving"
-    ];
+    function setShift(shift, el) {
+        currentShift = shift;
+        document.querySelectorAll('.shift-btn').forEach(btn => btn.classList.remove('active-shift'));
+        el.classList.add('active-shift');
+    }
 
-    function buildUI() {
-        const container = document.getElementById('main-container');
-        let htmlContent = '';
+    function renderStaff() {
+        const container = document.getElementById('staff-list-container');
+        container.innerHTML = staff.map((s, index) => `
+            <div class="card" data-name="${s.rank} ${s.name} ${s.id}">
+                <div><strong>${s.id}</strong> - ${s.rank} ${s.name}</div>
+                <label class="switch">
+                    <input type="checkbox" ${s.present ? 'checked' : ''} onchange="toggleAttendance(${index})">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        `).join('');
+    }
 
-        points.forEach((point) => {
-            htmlContent += `
-                <div class="card">
-                    <div class="point-title"><i class="fas fa-map-marker-alt"></i> ${point}</div>
-                    <select class="duty-select" data-point="${point}">
-                        <option value="">-- නිලධාරියෙකු තෝරන්න --</option>
-                        ${staffNames.map(name => `<option value="${name}">${name}</option>`).join('')}
-                    </select>
-                </div>`;
+    function toggleAttendance(index) {
+        staff[index].present = !staff[index].present;
+    }
+
+    function filterStaff() {
+        let val = document.getElementById('staffSearch').value.toLowerCase();
+        document.querySelectorAll('#staff-list-container .card').forEach(card => {
+            card.style.display = card.dataset.name.toLowerCase().includes(val) ? 'flex' : 'none';
         });
-        container.innerHTML = htmlContent;
     }
 
-    function sendWhatsApp() {
-        let msg = "*🛡️ IRONSHIELD DEFENDER - DUTY ROSTER*\n";
-        msg += "--------------------------------------\n\n";
-        let dutyFound = false;
-        
-        const selects = document.querySelectorAll('.duty-select');
-        selects.forEach(select => {
-            if(select.value !== "") {
-                msg += `📍 *${select.dataset.point}*\n👤 ${select.value}\n\n`;
-                dutyFound = true;
-            }
+    function showDutyScreen() {
+        document.getElementById('attendance-screen').classList.remove('active');
+        document.getElementById('duty-screen').classList.add('active');
+        renderDutyPoints();
+    }
+
+    function backToAttendance() {
+        document.getElementById('duty-screen').classList.remove('active');
+        document.getElementById('attendance-screen').classList.add('active');
+    }
+
+    function renderDutyPoints() {
+        const container = document.getElementById('duty-points-container');
+        container.innerHTML = points.map(p => `
+            <div class="duty-point" onclick="openOfficerSelection('${p}')">
+                <i class="fas fa-map-marker-alt"></i> ${p}
+                <span class="assigned-tag" id="tag-${p}">${assignments[p] || 'පත් කර නැත'}</span>
+            </div>
+        `).join('');
+    }
+
+    function openOfficerSelection(point) {
+        activePoint = point;
+        const modal = document.getElementById('officerModal');
+        const list = document.getElementById('available-officers-list');
+        modal.style.display = 'block';
+
+        const presentStaff = staff.filter(s => s.present);
+        list.innerHTML = presentStaff.map(s => `
+            <div class="card" onclick="assignOfficer('${s.rank} ${s.name}')">
+                ${s.rank} ${s.name} (${s.id})
+            </div>
+        `).join('');
+    }
+
+    function assignOfficer(name) {
+        assignments[activePoint] = name;
+        closeModal();
+        renderDutyPoints();
+    }
+
+    function closeModal() {
+        document.getElementById('officerModal').style.display = 'none';
+    }
+
+    function generateReport() {
+        let msg = `*🛡️ IRONSHIELD ROSTER - ${currentShift}*\n\n`;
+        points.forEach(p => {
+            msg += `📍 *${p}:* ${assignments[p] || '---'}\n`;
         });
-
-        if(!dutyFound) { 
-            alert("කරුණාකර අවම වශයෙන් එක් අයෙකු හෝ තෝරන්න!"); 
-            return; 
-        }
-        
-        msg += "--------------------------------------\n";
-        msg += "_Generated via IronShield Pro_";
-        
-        const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, '_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    function confirmReset() {
-        if(confirm("ඔබට සියල්ල ඉවත් කර නැවත ආරම්භ කිරීමට අවශ්‍යද?")) {
-            window.location.reload();
+    function addNewStaff() {
+        let name = prompt("නිලධාරියාගේ නම ඇතුළත් කරන්න:");
+        if(name) {
+            staff.push({ id: "NEW", rank: "S/G", name: name, present: true });
+            renderStaff();
         }
     }
 
-    buildUI();
+    renderStaff();
 </script>
-
 </body>
 </html>
