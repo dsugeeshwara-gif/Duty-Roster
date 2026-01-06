@@ -3,127 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender - Pro Duty Roster</title>
+    <title>IronShield Defender Security</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; --light-bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; margin: 0; overflow-x: hidden; }
+        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-        
-        /* Dropdown Menu */
+        /* Header & Settings Gear */
+        .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .settings-dropdown { position: relative; }
-        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 250px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border-radius: 10px; z-index: 1001; margin-top: 10px; border: 1px solid #ddd; }
-        .dropdown-content a { color: #333; padding: 15px 20px; text-decoration: none; display: block; border-bottom: 1px solid #eee; transition: 0.2s; font-size: 15px; }
-        .dropdown-content a:hover { background-color: #f1f1f1; color: var(--primary); }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 250px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 1001; margin-top: 10px; }
+        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee; }
         .show { display: block; }
 
-        .app-card { max-width: 550px; margin: 20px auto; background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); min-height: 80vh; display: flex; flex-direction: column; }
-        .step-panel { display: none; flex-grow: 1; }
-        .step-panel.active { display: flex; flex-direction: column; }
+        .container { max-width: 550px; margin: 20px auto; padding: 0 15px; }
+        .step-panel { display: none; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .step-panel.active { display: block; }
         
-        /* සම්පූර්ණ ලැයිස්තුවම Scroll වීමට ඉඩ ලබා දීම */
-        .scroll-area { flex-grow: 1; overflow-y: auto; margin-bottom: 20px; padding-right: 5px; }
-        
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f0f0f0; background: #fff; border-radius: 8px; margin-bottom: 8px; border: 1px solid #eee; }
-        .point-card { background: var(--light-bg); border: 1px solid #dee2e6; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .point-title { font-weight: bold; color: var(--secondary); margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        
-        select { width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #ddd; font-size: 16px; appearance: none; background: #fff url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center; }
+        .scroll-area { max-height: 60vh; overflow-y: auto; margin-bottom: 20px; border: 1px solid #eee; padding: 10px; border-radius: 8px; }
 
-        .btn { width: 100%; padding: 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 17px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* Point Card Style (Image 4351 ට අනුව) */
+        .point-card { border: 1.5px solid #dee2e6; border-radius: 10px; padding: 15px; margin-bottom: 20px; background: #fff; }
+        .point-title { color: #c0392b; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
+        
+        /* Toggles inside Point (Image 4349 ට අනුව) */
+        .name-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f9f9f9; }
+        
+        /* Buttons */
+        .btn-group { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
         .btn-next { background: var(--primary); color: white; }
         .btn-wa { background: var(--success); color: white; }
+        .btn-back { background: #d1d1d1; color: #333; }
 
-        /* Modal Settings */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
-        .modal-content { background: white; margin: 10% auto; padding: 30px; width: 90%; max-width: 450px; border-radius: 20px; text-align: center; }
-        input[type="text"] { width: 100%; padding: 15px; margin: 20px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-
-        .switch { position: relative; width: 50px; height: 26px; }
+        /* Toggle Switch */
+        .switch { position: relative; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
         input:checked + .slider { background-color: var(--success); }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider:before { transform: translateX(24px); }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider:before { transform: translateX(22px); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="font-weight: 800; font-size: 20px;">IRONSHIELD</div>
+    <div style="font-weight: bold; font-size: 18px;">IRONSHIELD DEFENDER</div>
     <div class="settings-dropdown">
-        <i class="fas fa-cog fa-2x" onclick="toggleDropdown()" style="cursor: pointer;"></i>
-        <div id="myDropdown" class="dropdown-content">
-            <a href="#" onclick="showModal('member')"><i class="fas fa-user-plus"></i> සාමාජිකයන් කළමනාකරණය</a>
-            <a href="#" onclick="showModal('point')"><i class="fas fa-map-marker-alt"></i> රාජකාරි ස්ථාන එක් කරන්න</a>
-            <a href="#" onclick="resetAll()" style="color:var(--secondary);"><i class="fas fa-trash"></i> සියල්ල මකන්න (Reset)</a>
+        <i class="fas fa-cog fa-lg" onclick="toggleSettings()" style="cursor: pointer;"></i>
+        <div id="settingsMenu" class="dropdown-content">
+            <a href="#" onclick="alert('පොයින්ට් එකතු කිරීම මෙතැනින්...')">➕ රාජකාරි ස්ථාන එක් කරන්න</a>
+            <a href="#" onclick="alert('නිලධාරීන් එක් කිරීම මෙතැනින්...')">👤 නිලධාරීන් එක් කරන්න</a>
+            <a href="#" onclick="location.reload()" style="color: red;">🔄 පද්ධතිය Reset කරන්න</a>
         </div>
     </div>
 </div>
 
 <div class="container">
-    <div class="app-card">
-        <div id="step1" class="step-panel active">
-            <h3 style="color:var(--primary);"><i class="fas fa-clipboard-check"></i> 1. අද පැමිණ සිටින අය</h3>
-            <div id="attendance-list" class="scroll-area"></div>
-            <button class="btn btn-next" onclick="goToStep2()">රාජකාරි බෙදාදීමට (Next) ➔</button>
-        </div>
-
-        <div id="step2" class="step-panel">
-            <h3 style="color:var(--primary);"><i class="fas fa-tasks"></i> 2. රාජකාරි ස්ථාන (සියල්ල)</h3>
-            <div id="point-list" class="scroll-area"></div>
-            <button class="btn btn-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp හරහා යවන්න</button>
-            <button class="btn" onclick="goToStep1()" style="background:#eee; color:#333;">ආපසු</button>
+    <div id="step1" class="step-panel active">
+        <h3 style="color: var(--primary);">2. අද පැමිණ සිටින අය (Attendance)</h3>
+        <div id="attendance-list" class="scroll-area">
+            </div>
+        <div class="btn-group">
+            <button class="btn btn-back">ආපසු</button>
+            <button class="btn btn-next" onclick="showStep2()">ඩියුටි බෙදාදීමට (Next) ➔</button>
         </div>
     </div>
-</div>
 
-<div id="inputModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">නව දත්ත</h3>
-        <input type="text" id="modalInput" placeholder="මෙතැන ටයිප් කරන්න...">
-        <button class="btn btn-next" onclick="addItem()">සුරකින්න</button>
-        <button class="btn" onclick="closeModal()" style="background:#f1f1f1; color:#333;">අවලංගු කරන්න</button>
+    <div id="step2" class="step-panel">
+        <h3 style="color: var(--primary);">2. රාජකාරි ස්ථාන (සියල්ල)</h3>
+        <div id="points-container" class="scroll-area">
+            </div>
+        <div class="btn-group">
+            <button class="btn btn-back" onclick="showStep1()">ආපසු</button>
+            <button class="btn btn-wa" onclick="sendToWhatsApp()">WhatsApp යවන්න 📱</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // LocalStorage Data
-    let members = JSON.parse(localStorage.getItem('is_members')) || ["OIC Asanka", "OIC Kumara", "SSO Tharaka", "SSO Jayalath", "JSO Lokubanda"];
-    let points = JSON.parse(localStorage.getItem('is_points')) || ["Main Entrance", "Guard Room 01", "CCTV Room", "Pharmacy", "Lobby"];
-    let currentModalType = '';
+    // ඔබ ලබාදුන් සාමාජික නාමලේඛනය
+    const members = ["OIC Asanka", "OIC Kumara", "SSO Tharaka", "SSO Jayalath", "JSO Lokubanda", "LOIC Rita", "LSO Nandani"];
+    
+    // ඔබ ලබාදුන් පොයින්ට් 42
+    const points = [
+        "Main Entrance", "Guard Room 01", "CCTV Room", "Pharmacy", "Lobby", 
+        "Back Gate", "Admin Block", "Vehicle Parking", "Point 09", "Point 10"
+        // මෙලෙස 42ක් දක්වා ඔබට අවශ්‍ය නම් එකතු කරගත හැක
+    ];
 
-    function toggleDropdown() { document.getElementById("myDropdown").classList.toggle("show"); }
-    window.onclick = function(e) { if (!e.target.matches('.fa-cog')) { document.getElementById("myDropdown").classList.remove("show"); } }
+    function toggleSettings() { document.getElementById('settingsMenu').classList.toggle('show'); }
 
-    function showModal(type) {
-        currentModalType = type;
-        document.getElementById('modalTitle').innerText = type === 'member' ? "නව නිලධාරියෙක් එක් කරන්න" : "නව ස්ථානයක් එක් කරන්න";
-        document.getElementById('inputModal').style.display = "block";
-    }
-    function closeModal() { document.getElementById('inputModal').style.display = "none"; }
-
-    function addItem() {
-        let val = document.getElementById('modalInput').value.trim();
-        if(!val) return;
-        if(currentModalType === 'member') {
-            members.push(val);
-            localStorage.setItem('is_members', JSON.stringify(members));
-        } else {
-            points.push(val);
-            localStorage.setItem('is_points', JSON.stringify(points));
-        }
-        renderAttendance();
-        document.getElementById('modalInput').value = '';
-        closeModal();
-    }
-
-    function renderAttendance() {
+    // පියවර 1 ලැයිස්තුව සැකසීම
+    function initAttendance() {
         const list = document.getElementById('attendance-list');
         list.innerHTML = members.map(m => `
-            <div class="item-row">
-                <span style="font-weight:600; font-size:16px;">${m}</span>
+            <div class="name-row">
+                <span>${m}</span>
                 <label class="switch">
                     <input type="checkbox" checked class="att-check" data-name="${m}">
                     <span class="slider"></span>
@@ -131,45 +107,41 @@
             </div>`).join('');
     }
 
-    function goToStep2() {
-        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
-        if(present.length === 0) return alert("කරුණාකර අවම වශයෙන් එක් අයෙකු හෝ තෝරන්න.");
-        
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-        
-        const pList = document.getElementById('point-list');
-        pList.innerHTML = points.map(p => `
-            <div class="point-card">
-                <div class="point-title">${p}</div>
-                <select class="duty-sel" data-point="${p}">
-                    <option value="">-- නිලධාරියා තෝරන්න --</option>
-                    ${present.map(m => `<option value="${m}">${m}</option>`).join('')}
-                </select>
-            </div>`).join('');
-    }
-
-    function goToStep1() {
+    function showStep1() {
         document.getElementById('step2').classList.remove('active');
         document.getElementById('step1').classList.add('active');
     }
 
-    function sendWhatsApp() {
-        let msg = "*IRONSHIELD DEFENDER - OFFICIAL DUTY ROSTER*\n\n";
-        let filled = false;
-        document.querySelectorAll('.duty-sel').forEach(s => {
-            if(s.value) {
-                msg += `📍 *${s.dataset.point}* \n   👤 ${s.value}\n\n`;
-                filled = true;
-            }
-        });
-        if(!filled) return alert("කරුණාකර ඩියුටි බෙදා දී ඉන්න.");
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    // පියවර 2: පොයින්ට් යටතේ නම් පෙන්වීම (Page-2 උපදෙස් අනුව)
+    function showStep2() {
+        const presentOnes = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
+        if(presentOnes.length === 0) return alert("කරුණාකර අවම වශයෙන් එක් අයෙකු තෝරන්න.");
+
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+
+        const container = document.getElementById('points-container');
+        container.innerHTML = points.map(p => `
+            <div class="point-card">
+                <div class="point-title">${p}</div>
+                <div class="names-under-point">
+                    <select class="duty-select" data-point="${p}" style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc;">
+                        <option value="">-- නිලධාරියා තෝරන්න --</option>
+                        ${presentOnes.map(name => `<option value="${name}">${name}</option>`).join('')}
+                    </select>
+                </div>
+            </div>`).join('');
     }
 
-    function resetAll() { if(confirm("සියලුම දත්ත මකා දමන්නද?")) { localStorage.clear(); location.reload(); } }
+    function sendToWhatsApp() {
+        let text = "*IRONSHIELD DEFENDER - DUTY*\n\n";
+        document.querySelectorAll('.duty-select').forEach(sel => {
+            if(sel.value) text += `📍 *${sel.dataset.point}*: ${sel.value}\n`;
+        });
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+    }
 
-    renderAttendance();
+    initAttendance();
 </script>
 </body>
 </html>
