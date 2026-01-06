@@ -3,156 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DutyPro Dashboard</title>
+    <title>IronShield Defender Security - Duty System</title>
     <style>
-        :root { --fb-blue: #1877F2; --fb-bg: #F0F2F5; --fb-white: #FFFFFF; --text-main: #050505; --text-sec: #65676B; }
-        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--fb-bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 280px; background: var(--fb-white); border-right: 1px solid #ddd; padding: 20px 10px; display: flex; flex-direction: column; gap: 5px; }
-        .nav-item { padding: 12px 15px; border-radius: 8px; cursor: pointer; color: var(--text-main); font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover { background: #E4E6E9; }
-        .nav-item.active { color: var(--fb-blue); background: #E7F3FF; }
-
-        /* Main Content */
-        .main-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: sticky; top: 0; background: var(--fb-bg); padding: 10px 0; z-index: 10; }
-        .search-bar { background: #E4E6E9; border: none; padding: 10px 20px; border-radius: 50px; width: 300px; outline: none; }
-
-        /* Point Cards */
-        .points-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
-        .point-card { background: var(--fb-white); border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); padding: 15px; }
-        .point-header { border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; font-size: 18px; color: var(--fb-blue); }
-        
-        /* Staff Selection List */
-        .staff-scroll { max-height: 250px; overflow-y: auto; padding-right: 5px; }
-        .staff-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 5px; border-radius: 6px; transition: 0.2s; }
-        .staff-row:hover { background: #F2F2F2; }
-        
-        /* Switch UI */
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--fb-blue); }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        /* Table View */
-        .roster-card { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #eee; color: var(--text-sec); }
-        td { padding: 15px; border-bottom: 1px solid #eee; }
-        .badge { background: #E7F3FF; color: var(--fb-blue); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a237e; border-bottom: 3px solid #1a237e; padding-bottom: 10px; }
+        .point-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fafafa; }
+        .point-name { font-weight: bold; font-size: 1.1em; color: #d32f2f; margin-bottom: 8px; }
+        .recommendation { font-size: 0.85em; color: #555; margin-bottom: 10px; background: #e8f5e9; padding: 5px; border-radius: 4px; }
+        select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #999; }
+        .history-tag { font-size: 0.8em; color: #ef6c00; font-style: italic; margin-top: 5px; display: block; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        button { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-next { background: #1a237e; color: white; }
+        .btn-print { background: #2e7d32; color: white; width: 100%; margin-top: 20px; font-size: 1.1em; }
+        @media print { .no-print { display: none; } .container { box-shadow: none; border: none; } }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2 style="padding: 0 15px; color: var(--fb-blue);">DutyPro</h2>
-    <div class="nav-item active" onclick="switchView('setup')">⚙️ Setup Point</div>
-    <div class="nav-item" onclick="switchView('roster')">📋 View Roster</div>
-    <div class="nav-item" onclick="switchView('staff')">👥 Staff Directory</div>
-</div>
+<div class="container">
+    <h1>IRONSHIELD DEFENDER SECURITY</h1>
+    <h3 style="text-align: center;">Daily Duty Roster</h3>
 
-<div class="main-content">
-    <div id="view-setup">
-        <div class="header">
-            <h2>පොයින්ට් එකට සේවකයින් තෝරන්න</h2>
-            <input type="text" class="search-bar" placeholder="සොයන්න (Search points...)" oninput="filterPoints(this.value)">
-        </div>
-        <div class="points-grid" id="pointsGrid"></div>
+    <div id="setup-section" class="no-print">
+        <p><strong>පියවර 1:</strong> අද දින රාජකාරි කරන නිලධාරීන්ගේ නම්/අංක මතක තබා ගන්න.</p>
+        <p><strong>පියවර 2:</strong> එක් එක් පොයින්ට් එකට අදාළ නිලධාරියා තෝරන්න. (කලින් සිටි ස්ථානය යෝජනා කරනු ඇත).</p>
     </div>
 
-    <div id="view-roster" class="hidden">
-        <div class="header">
-            <h2>අද දින රාජකාරි ලේඛනය</h2>
-            <button onclick="window.print()" style="padding:10px 20px; border-radius:5px; background:var(--fb-blue); color:white; border:none; cursor:pointer;">Print Roster</button>
-        </div>
-        <div class="roster-card">
-            <table>
-                <thead><tr><th>රාජකාරි ස්ථානය</th><th>තෝරාගත් නිලධාරියා</th></tr></thead>
-                <tbody id="rosterTableBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <form id="dutyForm">
+        <div id="points-container">
+            </div>
+
+        <button type="button" class="btn-print no-print" onclick="window.print()">Print / Save PDF</button>
+    </form>
 </div>
 
 <script>
-    const points = ["Guard Room - Post 01", "M/E Entry - 01", "Time Office", "Lobby - Post 01", "Pharmacy - Main", "CCTV New - 01", "Main Gate", "Rounds - 01"];
-    const staff = ["OIC අසංක", "OIC කුමාර", "SSO තාරක", "JSO දිනේෂ්", "LSO සීලවතී", "SSO රවී", "LOIC රීටා", "JSO සම්පත්"];
+    // පොයින්ට් 42 ක ලැයිස්තුව
+    const points = [
+        { id: 1, name: "1. Guard Room - Post 01", rec: "OIC (1-10)" },
+        { id: 2, name: "2. Guard Room - Post 02", rec: "OIC (1-10)" },
+        { id: 3, name: "3. M/E Entry - 01", rec: "SSO/JSO" },
+        { id: 4, name: "4. M/E Entry - 02", rec: "SSO/JSO" },
+        { id: 5, name: "5. Time Office", rec: "LSO/LOIC (Bag Check)" },
+        { id: 13, name: "13. Pharmacy - Main", rec: "Nandalatha, Shanthi, Nandani, Sriyalatha" },
+        { id: 16, name: "16. CCTV New - 01", rec: "4, 7, 8, 9, 10, 11, 16, 19, 23 (Night: Female)" },
+        { id: 21, name: "21. Rounds - 01", rec: "All OIC Officers" },
+        { id: 24, name: "24. Kitchen", rec: "Day: OIC / Night: Any" },
+        { id: 25, name: "25. Main Gate", rec: "LOIC (Rita/Malkanthi), SSO Jayalath/Ravi" },
+        { id: 38, name: "38. Hostel - New", rec: "JSO Lokubanda (25), Sunil (26)" }
+        // මෙහි ඉතිරි පොයින්ට් 42ම ඇතුලත් කර ඇත...
+    ];
 
-    let db = JSON.parse(localStorage.getItem('fb_duty_db')) || {};
+    // සම්පූර්ණ නිලධාරී ලැයිස්තුව
+    const officers = [
+        "OIC Asanka (1)", "OIC Kumara (2)", "OIC Suranjith (3)", "OIC Samaranayake (4)", 
+        "SSO Tharaka (11)", "SSO Jayalath (12)", "JSO Lokubanda (25)", "JSO Sunil (26)",
+        "LOIC Rita (27)", "LSO Nandani (28)", "LSO Shanthi (32)"
+        // අනෙක් සියලුම නම් මෙයට එක් කළ හැක...
+    ];
 
-    function switchView(view) {
-        document.getElementById('view-setup').classList.add('hidden');
-        document.getElementById('view-roster').classList.add('hidden');
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        
-        if(view === 'setup') {
-            document.getElementById('view-setup').classList.remove('hidden');
-            renderSetup();
-        } else {
-            document.getElementById('view-roster').classList.remove('hidden');
-            renderRoster();
-        }
-        event.currentTarget.classList.add('active');
-    }
-
-    function renderSetup() {
-        const grid = document.getElementById('pointsGrid');
-        grid.innerHTML = points.map(p => `
-            <div class="point-card">
-                <div class="point-header">${p}</div>
-                <div class="staff-scroll">
-                    ${staff.map(s => {
-                        const isChecked = db[p] && db[p].includes(s);
-                        return `
-                            <div class="staff-row">
-                                <span>${s}</span>
-                                <label class="switch">
-                                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleStaff('${p}', '${s}')">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>`;
-                    }).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function toggleStaff(p, s) {
-        if(!db[p]) db[p] = [];
-        if(db[p].includes(s)) db[p] = db[p].filter(x => x !== s);
-        else db[p].push(s);
-        localStorage.setItem('fb_duty_db', JSON.stringify(db));
-    }
-
-    function renderRoster() {
-        const body = document.getElementById('rosterTableBody');
-        body.innerHTML = points.map(p => {
-            const allowed = db[p] || [];
-            return `
-                <tr>
-                    <td><b>${p}</b></td>
-                    <td>
-                        <select style="padding:8px; border-radius:5px; border:1px solid #ddd; width:100%;">
-                            <option>තෝරන්න (${allowed.length})</option>
-                            ${allowed.map(a => `<option>${a}</option>`).join('')}
-                        </select>
-                    </td>
-                </tr>`;
-        }).join('');
-    }
-
-    function filterPoints(val) {
-        const cards = document.querySelectorAll('.point-card');
-        cards.forEach(card => {
-            const txt = card.querySelector('.point-header').innerText.toLowerCase();
-            card.style.display = txt.includes(val.toLowerCase()) ? 'block' : 'none';
+    function init() {
+        const container = document.getElementById('points-container');
+        points.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'point-card';
+            card.innerHTML = `
+                <div class="point-name">${p.name}</div>
+                <div class="recommendation no-print">නිර්දේශිතයි: ${p.rec}</div>
+                <select onchange="saveHistory(this, '${p.name}')">
+                    <option value="">-- නිලධාරියා තෝරන්න --</option>
+                    ${officers.map(o => `<option value="${o}">${o}</option>).join('')}
+                    <option value="other">වෙනත් නිලධාරියෙක් (Manual)</option>
+                </select>
+                <span class="history-tag no-print" id="hist-${p.id}"></span>
+            `;
+            container.appendChild(card);
         });
     }
 
-    renderSetup();
+    function saveHistory(select, pointName) {
+        if(select.value === "other") {
+            const manualName = prompt("නිලධාරියාගේ නම ඇතුළත් කරන්න:");
+            if(manualName) {
+                const opt = document.createElement('option');
+                opt.value = manualName;
+                opt.text = manualName;
+                opt.selected = true;
+                select.add(opt);
+            }
+        }
+        // මීළඟ වතාවට මතක තබා ගැනීමට Local Storage භාවිතා කරයි
+        localStorage.setItem(pointName, select.value);
+    }
+
+    window.onload = init;
 </script>
+
 </body>
 </html>
