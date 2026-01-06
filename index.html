@@ -3,130 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender - Professional System</title>
+    <title>IronShield Defender Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; margin: 0; padding: 0; }
-        .app-container { max-width: 600px; margin: auto; background: white; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-        .step-panel { padding: 20px; display: none; flex-grow: 1; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+        .header { background: var(--primary); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        
+        /* Settings Dropdown */
+        .settings-dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 1; }
+        .dropdown-content a { color: black; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee; }
+        .dropdown-content a:hover { background-color: #f1f1f1; }
+        .show { display: block; }
+
+        .container { max-width: 500px; margin: 20px auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .step-panel { display: none; }
         .step-panel.active { display: block; }
-        .card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .title { font-weight: bold; color: var(--primary); display: block; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        .btn-row { padding: 20px; background: #f9f9f9; display: flex; gap: 10px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        
+        .member-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-next { background: var(--primary); color: white; }
-        .btn-prev { background: #ccc; color: #333; }
-        .btn-final { background: var(--success); color: white; }
-        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        /* Toggle Switch Style */
-        .switch { position: relative; width: 45px; height: 22px; }
+        
+        /* Modal for adding members */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 20% auto; padding: 20px; width: 80%; border-radius: 10px; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        /* Toggle Switch */
+        .switch { position: relative; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
         input:checked + .slider { background-color: var(--success); }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider:before { transform: translateX(23px); }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider:before { transform: translateX(20px); }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <h2 style="margin:0">IRONSHIELD DEFENDER</h2>
-        <small>Smart Duty Roster Manager</small>
-    </div>
-
-    <div id="step1" class="step-panel active">
-        <span class="title">1. සාමාජික ලැයිස්තුව (Settings)</span>
-        <div id="member-settings" class="card">
-            <p style="font-size:13px; color:#666">මෙහිදී ඔබට සාමාජිකයන් ඇතුළත් කිරීම හෝ ඉවත් කිරීම කළ හැක.</p>
-            <div id="settings-list"></div>
-        </div>
-        <div class="btn-row">
-            <button class="btn-next" onclick="nextStep(2)">පැමිණීම සටහන් කිරීමට (Next) ➔</button>
-        </div>
-    </div>
-
-    <div id="step2" class="step-panel">
-        <span class="title">2. අද පැමිණ සිටින අය (Attendance)</span>
-        <div class="card" id="attendance-list">
-            </div>
-        <div class="btn-row">
-            <button class="btn-prev" onclick="nextStep(1)">ආපසු</button>
-            <button class="btn-next" onclick="nextStep(3)">ඩියුටි බෙදාදීමට (Next) ➔</button>
-        </div>
-    </div>
-
-    <div id="step3" class="step-panel">
-        <span class="title">3. රාජකාරි ස්ථාන (Duty Points)</span>
-        <div id="point-assignment-list">
-            </div>
-        <div class="btn-row">
-            <button class="btn-prev" onclick="nextStep(2)">ආපසු</button>
-            <button class="btn-final" onclick="generateWhatsApp()">නිමවා WhatsApp යවන්න ➔</button>
+<div class="header">
+    <div style="font-weight: bold;">IRONSHIELD DEFENDER</div>
+    <div class="settings-dropdown">
+        <i class="fas fa-cog fa-lg" onclick="toggleDropdown()" style="cursor: pointer;"></i>
+        <div id="myDropdown" class="dropdown-content">
+            <a href="#" onclick="showModal('member')"><i class="fas fa-user-plus"></i> සාමාජිකයන් එක් කරන්න</a>
+            <a href="#" onclick="showModal('point')"><i class="fas fa-map-marker-alt"></i> ස්ථාන එක් කරන්න</a>
+            <a href="#" onclick="clearAllData()" style="color:red;"><i class="fas fa-trash"></i> දත්ත මකා දමන්න</a>
         </div>
     </div>
 </div>
 
-<script>
-    // Data from your requirements
-    const defaultMembers = ["OIC Asanka", "OIC Kumara", "SSO Tharaka", "SSO Jayalath", "JSO Lokubanda", "LOIC Rita", "LSO Nandani"];
-    const points = ["Guard Room 01", "Guard Room 02", "Main Entrance", "Pharmacy Main", "CCTV New", "Main Gate"];
+<div class="container">
+    <div id="step1" class="step-panel active">
+        <h3 style="text-align:center; color: var(--primary);">2. අද පැමිණ සිටින අය (Attendance)</h3>
+        <div id="attendance-list"></div>
+        <button class="btn btn-next" onclick="goToStep2()">ඩියුටි බෙදාදීමට (Next) ➔</button>
+    </div>
 
-    function nextStep(step) {
-        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById('step' + step).classList.add('active');
-        if(step === 2) renderAttendance();
-        if(step === 3) renderPoints();
-        window.scrollTo(0,0);
+    <div id="step2" class="step-panel">
+        <h3 style="text-align:center; color: var(--primary);">3. රාජකාරි ස්ථාන</h3>
+        <div id="point-list"></div>
+        <button class="btn btn-next" style="background:var(--success)" onclick="sendWhatsApp()">WhatsApp යවන්න</button>
+        <button class="btn" onclick="goToStep1()" style="background:#eee">ආපසු</button>
+    </div>
+</div>
+
+<div id="dataModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">අලුත් නමක් ඇතුළත් කරන්න</h3>
+        <input type="text" id="modalInput" placeholder="නම මෙතැන ටයිප් කරන්න...">
+        <button class="btn btn-next" onclick="saveNewData()">සුරකින්න</button>
+        <button class="btn" onclick="closeModal()" style="background:#eee">අවලංගු කරන්න</button>
+    </div>
+</div>
+
+<script>
+    let members = JSON.parse(localStorage.getItem('is_members')) || ["OIC Asanka", "OIC Kumara", "SSO Tharaka"];
+    let points = JSON.parse(localStorage.getItem('is_points')) || ["Main Gate", "Pharmacy", "Guard Room"];
+    let currentModalType = '';
+
+    function toggleDropdown() { document.getElementById("myDropdown").classList.toggle("show"); }
+    window.onclick = function(event) { if (!event.target.matches('.fa-cog')) { 
+        document.getElementById("myDropdown").classList.remove("show"); 
+    }}
+
+    function showModal(type) {
+        currentModalType = type;
+        document.getElementById('modalTitle').innerText = type === 'member' ? "අලුත් සාමාජිකයෙක්" : "අලුත් රාජකාරි ස්ථානයක්";
+        document.getElementById('dataModal').style.display = "block";
+    }
+    
+    function closeModal() { document.getElementById('dataModal').style.display = "none"; }
+
+    function saveNewData() {
+        const val = document.getElementById('modalInput').value;
+        if(!val) return;
+        if(currentModalType === 'member') {
+            members.push(val);
+            localStorage.setItem('is_members', JSON.stringify(members));
+        } else {
+            points.push(val);
+            localStorage.setItem('is_points', JSON.stringify(points));
+        }
+        document.getElementById('modalInput').value = '';
+        closeModal();
+        renderAttendance();
     }
 
     function renderAttendance() {
-        const container = document.getElementById('attendance-list');
-        container.innerHTML = "";
-        defaultMembers.forEach(m => {
-            container.innerHTML += `
-                <div class="member-item">
-                    <span>${m}</span>
-                    <label class="switch">
-                        <input type="checkbox" checked class="att-check" data-name="${m}">
-                        <span class="slider"></span>
-                    </label>
-                </div>`;
-        });
+        const list = document.getElementById('attendance-list');
+        list.innerHTML = members.map(m => `
+            <div class="member-row">
+                <span>${m}</span>
+                <label class="switch">
+                    <input type="checkbox" checked class="att-check" data-name="${m}">
+                    <span class="slider"></span>
+                </label>
+            </div>`).join('');
     }
 
-    function renderPoints() {
-        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(el => el.dataset.name);
-        const container = document.getElementById('point-assignment-list');
-        container.innerHTML = "";
+    function goToStep2() {
+        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
         
-        points.forEach(p => {
-            const last = localStorage.getItem('L_'+p) || "පෙර දත්ත නැත";
-            container.innerHTML += `
-                <div class="card">
-                    <div style="font-weight:bold; color:red">${p}</div>
-                    <div style="font-size:11px; color:#999; margin-bottom:8px;">කලින් සිටියේ: ${last}</div>
-                    <select class="p-select" data-point="${p}" style="width:100%; padding:10px; border-radius:5px;">
-                        <option value="">-- නිලධාරියා තෝරන්න --</option>
-                        ${present.map(m => `<option value="${m}" ${last !== m ? 'selected' : ''}>${m}</option>`).join('')}
-                    </select>
-                </div>`;
-        });
+        const pList = document.getElementById('point-list');
+        pList.innerHTML = points.map(p => `
+            <div style="margin-bottom:15px; border:1px solid #ddd; padding:10px; border-radius:8px;">
+                <div style="font-weight:bold; color:red; margin-bottom:5px;">${p}</div>
+                <select class="duty-sel" data-point="${p}" style="width:100%; padding:8px;">
+                    <option value="">-- තෝරන්න --</option>
+                    ${present.map(m => `<option value="${m}">${m}</option>`).join('')}
+                </select>
+            </div>`).join('');
     }
 
-    function generateWhatsApp() {
-        let msg = "*IRONSHIELD DEFENDER - DUTY ROSTER*\n\n";
-        document.querySelectorAll('.p-select').forEach(s => {
-            if(s.value) {
-                msg += `📍 *${s.dataset.point}*: ${s.value}\n`;
-                localStorage.setItem('L_'+s.dataset.point, s.value);
-            }
+    function goToStep1() {
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step1').classList.add('active');
+    }
+
+    function sendWhatsApp() {
+        let msg = "*IRONSHIELD DEFENDER - DUTY*\n\n";
+        document.querySelectorAll('.duty-sel').forEach(s => {
+            if(s.value) msg += `📍 *${s.dataset.point}*: ${s.value}\n`;
         });
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
 
-    window.onload = () => nextStep(1);
+    function clearAllData() { if(confirm("සෑම දෙයක්ම මකා දැමීමට අවශ්‍යද?")) { localStorage.clear(); location.reload(); }}
+
+    renderAttendance();
 </script>
 </body>
 </html>
