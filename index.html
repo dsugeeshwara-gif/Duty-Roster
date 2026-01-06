@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender - Auto System</title>
+    <title>IronShield Defender - Smart System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding-bottom: 100px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; margin: 0; padding-bottom: 120px; }
         .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .dropdown-content { display: none; position: absolute; right: 20px; top: 60px; background: white; min-width: 200px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 8px; z-index: 1001; }
-        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; border-bottom: 1px solid #eee; }
-        .show { display: block; }
         .container { max-width: 550px; margin: 15px auto; padding: 0 15px; }
         .step-panel { display: none; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .step-panel.active { display: block; }
         .scroll-area { max-height: 60vh; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 20px; }
         .point-card { border: 1.5px solid #dee2e6; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: #fff; }
         .point-title { color: var(--secondary); font-weight: bold; margin-bottom: 5px; font-size: 15px; }
-        .last-person { font-size: 11px; color: #777; margin-bottom: 8px; font-style: italic; }
+        .req-info { font-size: 11px; color: #007bff; margin-bottom: 8px; font-weight: 500; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid #ccc; font-size: 16px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 8px; align-items: center; z-index: 999; }
         .btn { width: 95%; max-width: 500px; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-auto { background: #ff9800; color: white; margin-bottom: 5px; }
+        .btn-auto { background: #ff9800; color: white; }
         .btn-next { background: var(--primary); color: white; }
         .btn-wa { background: var(--success); color: white; }
+        .name-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
         .switch { position: relative; width: 44px; height: 22px; display: inline-block; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
         input:checked + .slider { background-color: var(--success); }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider:before { transform: translateX(22px); }
-        .name-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f1f1; }
     </style>
 </head>
 <body>
@@ -39,15 +36,14 @@
 <div class="header">
     <div style="font-weight: 800;">IRONSHIELD DEFENDER</div>
     <i class="fas fa-cog fa-2x" onclick="document.getElementById('myDropdown').classList.toggle('show')" style="cursor: pointer;"></i>
-    <div id="myDropdown" class="dropdown-content">
-        <a href="#" onclick="location.reload()">🔄 පද්ධතිය අලුත් කරන්න</a>
-        <a href="#" onclick="localStorage.clear(); location.reload();" style="color:red;">⚠️ සියලු දත්ත මකන්න</a>
+    <div id="myDropdown" style="display:none; position:absolute; right:20px; top:60px; background:white; box-shadow:0 4px 8px rgba(0,0,0,0.2); border-radius:8px;">
+        <a href="#" onclick="localStorage.clear(); location.reload();" style="display:block; padding:15px; color:red; text-decoration:none;">Reset Data</a>
     </div>
 </div>
 
 <div class="container">
     <div id="step1" class="step-panel active">
-        <h3 style="color: var(--primary); margin-top: 0;">1. අද පැමිණ සිටින අය</h3>
+        <h3 style="color: var(--primary); margin-top: 0;">1. පැමිණ සිටින නිලධාරීන්</h3>
         <div id="att-list" class="scroll-area"></div>
         <div class="footer-nav">
             <button class="btn btn-next" onclick="goToStep(2)">මීළඟ පියවර ➔</button>
@@ -55,9 +51,9 @@
     </div>
 
     <div id="step2" class="step-panel">
-        <h3 style="color: var(--primary); margin-top: 0;">2. රාජකාරි බෙදාදීම</h3>
-        <button class="btn btn-auto" onclick="autoAssign()"><i class="fas fa-magic"></i> Auto Assign (ස්වයංක්‍රීයව තෝරන්න)</button>
-        <div id="point-list" class="scroll-area"></div>
+        <h3 style="color: var(--primary); margin-top: 0;">2. ස්මාර්ට් ඩියුටි බෙදාදීම</h3>
+        <button class="btn btn-auto" onclick="smartAutoAssign()"><i class="fas fa-magic"></i> Smart Auto-Assign</button>
+        <div id="point-list" class="scroll-area" style="margin-top:10px;"></div>
         <div class="footer-nav">
             <button class="btn btn-wa" onclick="sendWA()">WhatsApp හරහා යවන්න 📱</button>
             <button class="btn" style="background:#eee" onclick="goToStep(1)">ආපසු</button>
@@ -66,12 +62,74 @@
 </div>
 
 <script>
-    const members = ["OIC Asanka", "OIC Kumara", "OIC Suranjith", "OIC Samaranayake", "OIC Dayarathne", "OIC Suresh", "OIC Mendis", "OIC Vijithalal", "OIC Rangana", "OIC Sampath", "SSO Tharaka", "SSO Jayalath", "SSO Viresh", "SSO Ravi", "SSO Ajith", "SSO Manusha", "SSO Rathnadasa", "JSO Prasanna", "JSO Pradeep", "JSO Chandana", "JSO Wijerathne", "JSO Raj", "JSO Dinesh", "JSO Ravindu", "JSO Lokubanda", "JSO Sunil", "LOIC Rita", "LSO Nandani", "LSO Seelawathi", "LSO Nalani", "LSO Wimalasooriya", "LSO Shanthi", "LSO Nandawathi", "LSO Dilani", "LSO Sriyalatha"];
-    const pointNames = ["1. Guard Room - Post 01", "2. Guard Room - Post 02", "3. M/E Entry - 01", "4. M/E Entry - 02", "5. Time Office", "6. B/C/P - Post 01", "7. B/C/P - Post 02", "8. Glass Door", "9. Lobby - Post 01", "10. Lobby - Post 02", "11. C/P/R", "12. Doctors' Lift", "13. Pharmacy - Main", "14. Pharmacy - OPD", "15. Pharmacy - Hospital", "16. CCTV New - 01", "17. CCTV New - 02", "18. C/P/03", "19. C/P/04", "20. Commercial Hostel", "21. Rounds - 01", "22. Rounds - 02", "23. Kitchen Stores", "24. Kitchen", "25. Main Gate", "26. 2nd Basement", "27. SICU", "28. MICU", "29. CCTV Old - 01", "30. CCTV Old - 02", "31. Lift Lobby - 3F", "32. Lift Lobby - 4F", "33. Lift Lobby - 5F", "34. Lift Lobby - 6F", "35. Fort City", "36. Lady Hostel - New", "37. Hostel - Old", "38. Hostel - New", "39. Layanal Area", "40. Bambalapitiya Area", "41. Dilan Area", "42. Receiving"];
+    // නිලධාරීන් සහ ඔවුන්ගේ වර්ගය
+    const staff = [
+        {name: "OIC Asanka", type: "OIC"}, {name: "OIC Kumara", type: "OIC"}, {name: "OIC Suranjith", type: "OIC"},
+        {name: "OIC Samaranayake", type: "OIC"}, {name: "OIC Dayarathne", type: "OIC"}, {name: "OIC Suresh", type: "OIC"},
+        {name: "OIC Mendis", type: "OIC"}, {name: "OIC Vijithalal", type: "OIC"}, {name: "OIC Rangana", type: "OIC"},
+        {name: "OIC Sampath", type: "OIC"}, {name: "SSO Tharaka", type: "SSO"}, {name: "SSO Jayalath", type: "SSO"},
+        {name: "SSO Viresh", type: "SSO"}, {name: "SSO Ravi", type: "SSO"}, {name: "SSO Ajith", type: "SSO"},
+        {name: "SSO Manusha", type: "SSO"}, {name: "SSO Rathnadasa", type: "SSO"}, {name: "JSO Prasanna", type: "JSO"},
+        {name: "JSO Pradeep", type: "JSO"}, {name: "JSO Chandana", type: "JSO"}, {name: "JSO Wijerathne", type: "JSO"},
+        {name: "JSO Raj", type: "JSO"}, {name: "JSO Dinesh", type: "JSO"}, {name: "JSO Ravindu", type: "JSO"},
+        {name: "JSO Lokubanda", type: "JSO"}, {name: "JSO Sunil", type: "JSO"}, {name: "LOIC Rita", type: "LOIC"},
+        {name: "LSO Nandani", type: "LSO"}, {name: "LSO Seelawathi", type: "LSO"}, {name: "LSO Nalani", type: "LSO"},
+        {name: "LSO Shanthi", type: "LSO"}, {name: "LSO Nandawathi", type: "LSO"}, {name: "LSO Dilani", type: "LSO"},
+        {name: "LSO Sriyalatha", type: "LSO"}
+    ];
+
+    // පොයින්ට් සහ කොන්දේසි
+    const dutyPoints = [
+        {p: "1. Guard Room - Post 01", req: ["OIC"]},
+        {p: "2. Guard Room - Post 02", req: ["OIC"]},
+        {p: "3. M/E Entry - 01", req: ["OIC", "SSO", "JSO"]},
+        {p: "4. M/E Entry - 02", req: ["OIC", "SSO", "JSO"]},
+        {p: "5. Time Office", req: ["LSO", "LOIC"]},
+        {p: "6. B/C/P - Post 01", req: ["SSO", "JSO"]},
+        {p: "7. B/C/P - Post 02", req: ["SSO", "JSO"]},
+        {p: "8. Glass Door", req: ["SSO", "JSO"]},
+        {p: "9. Lobby - Post 01", req: ["SSO", "JSO"]},
+        {p: "10. Lobby - Post 02", req: ["SSO", "JSO"]},
+        {p: "11. C/P/R", req: ["SSO", "JSO"]},
+        {p: "12. Doctors' Lift", req: ["LSO"]},
+        {p: "13. Pharmacy - Main", req: ["LSO"]},
+        {p: "14. Pharmacy - OPD", req: ["LSO"]},
+        {p: "15. Pharmacy - Helpper", req: ["LSO", "SSO", "JSO"]},
+        {p: "16. CCTV New - 01", req: ["OIC", "SSO", "JSO"]},
+        {p: "17. CCTV New - 02", req: ["OIC", "SSO", "JSO"]},
+        {p: "18. C/P/03", req: ["OIC", "JSO", "SSO"]},
+        {p: "19. C/P/04", req: ["JSO", "LSO"]},
+        {p: "20. Commercial Hostel", req: ["LOIC", "LSO"]},
+        {p: "21. Rounds - 01", req: ["OIC"]},
+        {p: "22. Rounds - 02", req: ["OIC"]},
+        {p: "23. Kitchen Stores", req: ["LSO", "LOIC"]},
+        {p: "24. Kitchen", req: ["OIC", "LSO", "SSO"], info: "Day: OIC / Other: LSO, SSO"},
+        {p: "25. Main Gate", req: ["OIC", "SSO", "JSO"], info: "Day: 1 Person / Night: 2 Persons"},
+        {p: "26. 2nd Basement", req: ["JSO", "SSO"]},
+        {p: "27. SICU", req: ["JSO", "LSO"]},
+        {p: "28. MICU", req: ["JSO", "LSO"]},
+        {p: "29. CCTV Old - 01", req: ["OIC", "SSO", "JSO"]},
+        {p: "30. CCTV Old - 02", req: ["OIC", "SSO", "JSO"]},
+        {p: "35. Fort City", req: ["OIC", "SSO", "JSO"]},
+        {p: "36. Lady Hostel New", req: ["LSO"], info: "Night Only"},
+        {p: "37. Hostel - Old", req: ["SSO", "JSO"]},
+        {p: "38. Hostel - New", req: ["SSO", "JSO"]},
+        {p: "39. Layanal banglow", req: ["OIC", "SSO", "JSO"]},
+        {p: "40. Bambalapitiya Area", req: ["OIC", "SSO", "JSO"]},
+        {p: "41. Dilan Banglow", req: ["OIC", "SSO", "JSO"]},
+        {p: "42. Receiving", req: ["OIC"], info: "Night: Vacant"}
+    ];
 
     function init() {
         const attDiv = document.getElementById('att-list');
-        attDiv.innerHTML = members.map(m => `<div class="name-row"><span>${m}</span><label class="switch"><input type="checkbox" checked class="att-check" data-name="${m}"><span class="slider"></span></label></div>`).join('');
+        attDiv.innerHTML = staff.map(s => `
+            <div class="name-row">
+                <span><b>${s.type}</b> - ${s.name}</span>
+                <label class="switch">
+                    <input type="checkbox" checked class="att-check" data-name="${s.name}" data-type="${s.type}">
+                    <span class="slider"></span>
+                </label>
+            </div>`).join('');
     }
 
     function goToStep(n) {
@@ -82,40 +140,43 @@
     }
 
     function renderPoints() {
-        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
+        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => ({name: c.dataset.name, type: c.dataset.type}));
         const pList = document.getElementById('point-list');
-        pList.innerHTML = pointNames.map(p => {
-            const last = localStorage.getItem('last_' + p) || "පෙර දත්ත නැත";
-            return `<div class="point-card"><div class="point-title">${p}</div><div class="last-person">කලින් හිටියේ: ${last}</div><select class="duty-sel" data-point="${p}"><option value="">-- තෝරන්න --</option>${present.map(m => `<option value="${m}">${m}</option>`).join('')}</select></div>`;
-        }).join('');
+        pList.innerHTML = dutyPoints.map(dp => `
+            <div class="point-card">
+                <div class="point-title">${dp.p}</div>
+                <div class="req-info">අවශ්‍ය: ${dp.req.join(', ')} ${dp.info ? ' | ' + dp.info : ''}</div>
+                <select class="duty-sel" data-point="${dp.p}" data-req='${JSON.stringify(dp.req)}'>
+                    <option value="">-- නිලධාරියා තෝරන්න --</option>
+                    ${present.map(m => `<option value="${m.name}">${m.name} (${m.type})</option>`).join('')}
+                </select>
+            </div>`).join('');
     }
 
-    function autoAssign() {
-        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => c.dataset.name);
+    function smartAutoAssign() {
+        const present = Array.from(document.querySelectorAll('.att-check:checked')).map(c => ({name: c.dataset.name, type: c.dataset.type}));
         let available = [...present];
+        
         document.querySelectorAll('.duty-sel').forEach(sel => {
-            const pName = sel.dataset.point;
-            const lastPerson = localStorage.getItem('last_' + pName);
-            // කලින් හිටපු කෙනා නොවන, දැනට ඉන්න කෙනෙක් සෙවීම
-            let bestFit = available.find(name => name !== lastPerson) || available[0];
-            if (bestFit) {
-                sel.value = bestFit;
-                available = available.filter(n => n !== bestFit);
-                if (available.length === 0) available = [...present]; // සාමාජිකයන් ඉවර වුණොත් නැවත පටන් ගන්න
+            const allowedTypes = JSON.parse(sel.dataset.req);
+            const match = available.find(s => allowedTypes.includes(s.type));
+            
+            if (match) {
+                sel.value = match.name;
+                available = available.filter(s => s.name !== match.name);
+                if (available.length === 0) available = [...present];
             }
         });
     }
 
     function sendWA() {
-        let msg = "*IRONSHIELD DEFENDER - DUTY ROSTER*\n\n";
+        let msg = "*IRONSHIELD DEFENDER - DUTY*\n\n";
         document.querySelectorAll('.duty-sel').forEach(s => {
-            if(s.value) {
-                msg += `📍 *${s.dataset.point}* : ${s.value}\n`;
-                localStorage.setItem('last_' + s.dataset.point, s.value); // අද දත්ත මතක තබා ගැනීම
-            }
+            if(s.value) msg += `📍 *${s.dataset.point}* : ${s.value}\n`;
         });
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
+
     init();
 </script>
 </body>
