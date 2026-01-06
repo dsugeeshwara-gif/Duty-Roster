@@ -3,73 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronShield Defender - Scroll Optimized</title>
+    <title>IronShield Defender - Full Version</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; --bg: #f4f7f9; }
-        
-        /* මුළු පිටුවම Scroll නොවී පාලනය කිරීමට */
+        :root { --primary: #1a237e; --secondary: #d32f2f; --success: #2e7d32; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        
+        .header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .container { flex-grow: 1; overflow: hidden; display: flex; flex-direction: column; padding: 10px; max-width: 600px; margin: auto; width: 100%; box-sizing: border-box; }
-        
-        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; flex-direction: column; height: 100%; max-height: 85vh; }
+        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; flex-direction: column; height: 100%; }
         .card.active { display: flex; }
-
-        /* Scroll පහසුකම ලබාදෙන ප්‍රධාන කොටස */
-        .scroll-area { flex-grow: 1; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fafafa; -webkit-overflow-scrolling: touch; }
-        
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #f1f1f1; }
-        
-        .point-card { border-left: 5px solid var(--secondary); margin-bottom: 12px; padding: 12px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
-        .btn-group { flex-shrink: 0; padding-top: 5px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .scroll-area { flex-grow: 1; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fff; -webkit-overflow-scrolling: touch; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #eee; }
+        .point-card { border-left: 5px solid var(--secondary); margin-bottom: 12px; padding: 12px; background: #fdfdfd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-top: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .btn-next { background: var(--primary); color: white; }
         .btn-wa { background: var(--success); color: white; }
         .btn-auto { background: #ff9800; color: white; margin-bottom: 10px; }
-
-        /* Settings CSS */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 450px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
-        
         .switch { position: relative; width: 44px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
         input:checked + .slider { background-color: var(--success); }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider:before { transform: translateX(22px); }
-        
-        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; margin-top: 5px; box-sizing: border-box; font-size: 16px; }
+        select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bbb; margin-top: 5px; font-size: 15px; background: #fff; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 85%; max-width: 450px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div style="font-weight: 800; font-size: 18px;">IRONSHIELD</div>
+    <div style="font-weight: 800; font-size: 18px; letter-spacing: 1px;">IRONSHIELD</div>
     <i class="fas fa-cog fa-lg" onclick="openSettings()" style="cursor: pointer;"></i>
 </div>
 
 <div class="container">
     <div id="step1" class="card active">
-        <h3 style="margin: 0 0 10px 0;"><i class="fas fa-user-check"></i> 1. පැමිණීමේ ලේඛනය</h3>
-        <div id="att-list" class="scroll-area">
-            </div>
+        <h3 style="margin: 0 0 10px 0; color: var(--primary);"><i class="fas fa-user-check"></i> 1. පැමිණීම (නිලධාරීන් 35)</h3>
+        <div id="att-list" class="scroll-area"></div>
         <div class="btn-group">
-            <button class="btn btn-next" onclick="goToStep(2)">රාජකාරි බෙදාදීමට ➔</button>
+            <button class="btn btn-next" onclick="goToStep(2)">රාජකාරි ස්ථාන වෙත ➔</button>
         </div>
     </div>
 
     <div id="step2" class="card">
-        <h3 style="margin: 0 0 10px 0;"><i class="fas fa-tasks"></i> 2. රාජකාරි බෙදාදීම</h3>
-        <button class="btn btn-auto" onclick="smartAutoAssign()"><i class="fas fa-magic"></i> Auto-Assign</button>
-        <div id="point-list" class="scroll-area">
-            </div>
+        <h3 style="margin: 0 0 10px 0; color: var(--primary);"><i class="fas fa-map-marker-alt"></i> 2. රාජකාරි බෙදාදීම (ස්ථාන 42)</h3>
+        <button class="btn btn-auto" onclick="smartAutoAssign()"><i class="fas fa-magic"></i> Auto-Assign කරන්න</button>
+        <div id="point-list" class="scroll-area"></div>
         <div class="btn-group">
-            <button class="btn btn-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp යවන්න</button>
-            <button class="btn" style="background:#eee; color:#333;" onclick="goToStep(1)">ආපසු</button>
+            <button class="btn btn-wa" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp Report</button>
+            <button class="btn" style="background:#ddd; color:#333;" onclick="goToStep(1)">පැමිණීම වෙනස් කරන්න</button>
         </div>
     </div>
 </div>
@@ -77,69 +60,60 @@
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin:0;">Settings</h3>
-            <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer; font-size: 20px;"></i>
+            <h3>සැකසුම්</h3>
+            <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer;"></i>
         </div>
-        <hr>
         <button class="btn" style="background:#f44336; color:white;" onclick="resetSystem()">System Reset</button>
-        
-        <h4>නව නිලධාරියෙකු එක් කරන්න</h4>
-        <input type="text" id="newStaffName" placeholder="නම (උදා: OIC Saman)">
-        <select id="newStaffType">
-            <option value="OIC">OIC</option>
-            <option value="SSO">SSO</option>
-            <option value="JSO">JSO</option>
-            <option value="LSO">LSO</option>
-            <option value="LOIC">LOIC</option>
-        </select>
-        <button class="btn" style="background:var(--success); color:white;" onclick="addNewStaff()">එකතු කරන්න</button>
-        
-        <h4>දැනට සිටින නිලධාරීන්</h4>
-        <div id="manage-staff-list" style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 5px;">
-            </div>
+        <p style="font-size: 12px; color: #666; margin-top: 15px;">සටහන: නව නම් එක් කිරීමේදී LocalStorage භාවිතා වේ.</p>
     </div>
 </div>
 
 <script>
-    // නිලධාරීන් ලැයිස්තුව
-    let staff = JSON.parse(localStorage.getItem('ironStaff')) || [
-        {name: "OIC Asanka", type: "OIC"}, {name: "OIC Kumara", type: "OIC"}, {name: "SSO Tharaka", type: "SSO"},
-        {name: "SSO Jayalath", type: "SSO"}, {name: "JSO Prasanna", type: "JSO"}, {name: "JSO Pradeep", type: "JSO"},
-        {name: "LSO Nandani", type: "LSO"}, {name: "LSO Seelawathi", type: "LSO"}
+    // 1. සම්පූර්ණ නාමලේඛනය (35 දෙනා)
+    const initialStaff = [
+        {name: "OIC Asanka", type: "OIC"}, {name: "OIC Kumara", type: "OIC"}, {name: "OIC Suranjith", type: "OIC"}, {name: "OIC Samaranayake", type: "OIC"}, {name: "OIC Dayarathne", type: "OIC"}, {name: "OIC Suresh", type: "OIC"}, {name: "OIC Mendis", type: "OIC"}, {name: "OIC Vijithalal", type: "OIC"}, {name: "OIC Rangana", type: "OIC"}, {name: "OIC Sampath", type: "OIC"},
+        {name: "SSO Tharaka", type: "SSO"}, {name: "SSO Jayalath", type: "SSO"}, {name: "SSO Viresh", type: "SSO"}, {name: "SSO Ravi", type: "SSO"}, {name: "SSO Ajith", type: "SSO"}, {name: "SSO Manusha", type: "SSO"}, {name: "SSO Rathnadasa", type: "SSO"},
+        {name: "JSO Prasanna", type: "JSO"}, {name: "JSO Pradeep", type: "JSO"}, {name: "JSO Chandana", type: "JSO"}, {name: "JSO Wijerathne", type: "JSO"}, {name: "JSO Raj", type: "JSO"}, {name: "JSO Dinesh", type: "JSO"}, {name: "JSO Ravindu", type: "JSO"}, {name: "JSO Lokubanda", type: "JSO"}, {name: "JSO Sunil", type: "JSO"},
+        {name: "LOIC Rita", type: "LOIC"}, {name: "LSO Nandani", type: "LSO"}, {name: "LSO Seelawathi", type: "LSO"}, {name: "LSO Nalani", type: "LSO"}, {name: "LSO Shanthi", type: "LSO"}, {name: "LSO Nandawathi", type: "LSO"}, {name: "LSO Dilani", type: "LSO"}, {name: "LSO Sriyalatha", type: "LSO"}
     ];
 
-    // රාජකාරි ස්ථාන 42ක ලැයිස්තුව (කෙටියෙන් පෙන්වා ඇත)
+    // 2. සම්පූර්ණ රාජකාරි ස්ථාන ලැයිස්තුව (42)
     const dutyPoints = [
         {p: "1. Guard Room", req: ["OIC"]}, {p: "2. Guard Room", req: ["OIC"]},
-        {p: "3. Main Entry", req: ["OIC", "SSO", "JSO"]}, {p: "4. Main Entry", req: ["OIC", "SSO", "JSO"]},
+        {p: "3. M/E Entry", req: ["OIC", "SSO", "JSO"]}, {p: "4. M/E Entry", req: ["OIC", "SSO", "JSO"]},
         {p: "5. Time Office", req: ["LSO", "LOIC"]}, {p: "6. B/C/P", req: ["SSO", "JSO"]},
-        {p: "7. Glass Door", req: ["SSO", "JSO"]}, {p: "8. Pharmacy", req: ["LSO"]},
-        {p: "9. CCTV New", req: ["OIC", "SSO", "JSO"]}, {p: "10. Rounds", req: ["OIC"]}
-        // මීට අමතරව අනෙක් පොයින්ට්ස් ද මෙසේම ක්‍රියාත්මක වේ.
+        {p: "7. B/C/P", req: ["SSO", "JSO"]}, {p: "8. Glass Door", req: ["SSO", "JSO"]},
+        {p: "9. Lobby - 01", req: ["SSO", "JSO"]}, {p: "10. Lobby - 02", req: ["SSO", "JSO"]},
+        {p: "11. C/P/R", req: ["SSO", "JSO"]}, {p: "12. Doctors Lift", req: ["LSO"]},
+        {p: "13. Pharmacy - Main", req: ["LSO"]}, {p: "14. Pharmacy - OPD", req: ["LSO"]},
+        {p: "15. Pharmacy - Helper", req: ["LSO", "SSO", "JSO"]}, {p: "16. CCTV New", req: ["OIC", "SSO", "JSO"]},
+        {p: "17. CCTV New", req: ["OIC", "SSO", "JSO"]}, {p: "18. C/P/03", req: ["OIC", "SSO", "JSO"]},
+        {p: "19. C/P/04", req: ["JSO", "LSO"]}, {p: "20. Commercial Hostel", req: ["LOIC", "LSO"]},
+        {p: "21. Rounds", req: ["OIC"]}, {p: "22. Rounds", req: ["OIC"]},
+        {p: "23. Kitchen Stores", req: ["LSO", "LOIC"]}, {p: "24. Kitchen", req: ["OIC", "LSO", "SSO"]},
+        {p: "25. Main Gate", req: ["OIC", "SSO", "JSO"]}, {p: "26. 2nd Basement", req: ["JSO", "SSO"]},
+        {p: "27. SICU", req: ["JSO", "LSO"]}, {p: "28. MICU", req: ["JSO", "LSO"]},
+        {p: "29. CCTV Old", req: ["OIC", "SSO", "JSO"]}, {p: "30. CCTV Old", req: ["OIC", "SSO", "JSO"]},
+        {p: "31. Lift Lobby-3F", req: ["SSO", "JSO", "LSO"]}, {p: "32. Lift Lobby-4F", req: ["SSO", "JSO", "LSO"]},
+        {p: "33. Lift Lobby-5F", req: ["SSO", "JSO", "LSO"]}, {p: "34. Lift Lobby-6F", req: ["SSO", "JSO", "LSO"]},
+        {p: "35. Fort City", req: ["OIC", "SSO", "JSO"]}, {p: "36. Lady Hostel New", req: ["LSO"]},
+        {p: "37. Hostel Old", req: ["SSO", "JSO"]}, {p: "38. Hostel New", req: ["SSO", "JSO"]},
+        {p: "39. Layanal Banglow", req: ["OIC", "SSO", "JSO"]}, {p: "40. Bambalapitiya Area", req: ["OIC", "SSO", "JSO"]},
+        {p: "41. Dilan Banglow", req: ["OIC", "SSO", "JSO"]}, {p: "42. Receiving", req: ["OIC"]}
     ];
+
+    let staff = JSON.parse(localStorage.getItem('ironStaff')) || initialStaff;
 
     function init() {
         const attDiv = document.getElementById('att-list');
-        attDiv.innerHTML = staff.map((s, index) => `
+        attDiv.innerHTML = staff.map((s, i) => `
             <div class="item-row">
                 <span><b>${s.type}</b> - ${s.name}</span>
                 <label class="switch">
-                    <input type="checkbox" checked class="att-check" data-index="${index}">
+                    <input type="checkbox" checked class="att-check" data-index="${i}">
                     <span class="slider"></span>
                 </label>
             </div>`).join('');
-        
-        renderManageStaff();
-    }
-
-    function renderManageStaff() {
-        const mList = document.getElementById('manage-staff-list');
-        mList.innerHTML = staff.map((s, index) => `
-            <div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee; font-size:13px;">
-                <span>${s.name}</span>
-                <i class="fas fa-trash" style="color:red; cursor:pointer;" onclick="deleteStaff(${index})"></i>
-            </div>
-        `).join('');
     }
 
     function goToStep(n) {
@@ -151,14 +125,14 @@
     function renderPoints() {
         const presentIndices = Array.from(document.querySelectorAll('.att-check:checked')).map(c => parseInt(c.dataset.index));
         const presentStaff = presentIndices.map(i => staff[i]);
-        
         const pList = document.getElementById('point-list');
+        
         pList.innerHTML = dutyPoints.map(dp => `
             <div class="point-card">
-                <div style="font-weight:bold; color:var(--primary); font-size:15px;">${dp.p}</div>
-                <div style="font-size:11px; color:#666; margin-bottom:5px;">අවශ්‍ය: ${dp.req.join('/')}</div>
+                <div style="font-weight:bold; color:var(--primary);">${dp.p}</div>
+                <div style="font-size:11px; color:#666;">අවශ්‍ය: ${dp.req.join('/')}</div>
                 <select class="duty-sel" data-point="${dp.p}" data-req='${JSON.stringify(dp.req)}'>
-                    <option value="">-- තෝරන්න --</option>
+                    <option value="">-- නිලධාරියා තෝරන්න --</option>
                     ${presentStaff.map(s => `<option value="${s.name}">${s.name} (${s.type})</option>`).join('')}
                 </select>
             </div>`).join('');
@@ -169,43 +143,14 @@
         let available = presentIndices.map(i => staff[i]);
         
         document.querySelectorAll('.duty-sel').forEach(sel => {
-            const reqTypes = JSON.parse(sel.dataset.req);
-            const match = available.find(s => reqTypes.includes(s.type));
-            if (match) {
+            const req = JSON.parse(sel.dataset.req);
+            const match = available.find(s => req.includes(s.type));
+            if(match) {
                 sel.value = match.name;
                 available = available.filter(s => s !== match);
                 if(available.length === 0) available = presentIndices.map(i => staff[i]);
             }
         });
-    }
-
-    function openSettings() { document.getElementById('settingsModal').style.display = 'block'; }
-    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-
-    function addNewStaff() {
-        const name = document.getElementById('newStaffName').value;
-        const type = document.getElementById('newStaffType').value;
-        if(name) {
-            staff.push({name, type});
-            localStorage.setItem('ironStaff', JSON.stringify(staff));
-            document.getElementById('newStaffName').value = '';
-            init();
-        }
-    }
-
-    function deleteStaff(index) {
-        if(confirm('මොහු ඉවත් කරන්නද?')) {
-            staff.splice(index, 1);
-            localStorage.setItem('ironStaff', JSON.stringify(staff));
-            init();
-        }
-    }
-
-    function resetSystem() {
-        if(confirm('සැබවින්ම පද්ධතිය Reset කරන්නද?')) {
-            localStorage.clear();
-            location.reload();
-        }
     }
 
     function sendWhatsApp() {
@@ -215,6 +160,10 @@
         });
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
+
+    function openSettings() { document.getElementById('settingsModal').style.display='block'; }
+    function closeSettings() { document.getElementById('settingsModal').style.display='none'; }
+    function resetSystem() { if(confirm('Reset කරන්නද?')) { localStorage.clear(); location.reload(); } }
 
     init();
 </script>
